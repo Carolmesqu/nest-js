@@ -1,0 +1,88 @@
+Criar um projeto com Nest é bem fácil, o próprio framework disponibiliza uma 
+ferramenta de linha de comando (CLI) para que não tenhamos muito trabalho 
+instalando e configurando vários pacotes diferentes usando o NPM.
+
+Para criar um novo projeto Nest, tudo que precisamos fazer é usar o comando 
+abaixo no terminal, em um diretório de sua preferência, informando o nome 
+do projeto logo após o new. No nosso caso, o projeto se chamará loja.
+
+npx @nestjs/cli new loja
+
+Este comando pode demorar um pouco dependendo da sua conexão de internet, 
+isso por que ele vai criar uma nova pasta com o mesmo nome do projeto, 
+criar também o package.json que o Node precisa para gerenciar as 
+dependências do projeto e baixar todas as dependências necessárias 
+para a execução do Nest.
+
+Após este processo finalizar, podemos entrar na pasta do projeto e usar 
+o comando npm start para iniciar o projeto. Porém, como estamos em 
+desenvolvimento, é mais interessante que usemos o servidor de desenvolvimento, 
+já que este observa as mudanças que faremos nos arquivos e automaticamente 
+reinicia o servidor para que possamos testar nossas mudanças no navegador 
+ou no postman.
+
+Para iniciar o servidor de desenvolvimento, basta usar o comando 
+npm run start:dev. Lembre-se de parar o servidor anterior caso tenha iniciado. 
+Você pode fazer isso com o atalho de teclado CTRL + C no terminal.
+
+O Servidor estará ouvindo requisições na porta 3000, então podemos acessar 
+http://localhost:3000 e veremos uma mensagem de Hello World. Experimente 
+brincar um pouco com o Nest modificando esta mensagem que está no 
+App.service.ts.
+
+---------------------------------------------------------------------------------
+
+Compreender o que é o Nest, e assim saber algumas de suas características.
+A usar a CLI do Nest, para criar projetos.
+Usar o npm para iniciar o servidor de do Nest para receber requisições.
+
+---------------------------------------------------------------------------------
+
+O Time do Alex está usando Nest em seu projeto para salvar os produtos de uma 
+compra. O código do controller que recebe os dados é semelhante ao que se 
+encontra abaixo. Porém, os dados não estão sendo salvos corretamente. 
+Analise abaixo:
+
+@Controller('/compras')
+export class CompraController {
+    construtor(private compraRepository: CompraRepository){}
+
+    @Post()
+    async registra(produtos: Produto[]) {
+         this.compraRepository.salva(produtos);
+    }
+}
+
+Assinale a alternativa que justifica o motivo dos dados não estarem sendo salvos 
+corretamente:
+
+R: O parâmetro produtos no método registra, não tem nenhum decorator indicando 
+de onde o Nest deve buscar o valor, o correto seria decorar esse parâmetro 
+com @Body.
+Sem o decorator @Body, o Nest não sabe de onde buscar o valor desejado para o 
+parâmetro do método. Neste caso, estamos pedindo para o Nest popular o parâmetro 
+produtos com o que vier no body da requisição.
+
+---------------------------------------------------------------------------------
+
+O Nest possui outros decorators para capturar dados a partir de uma requisição, 
+inclusive o @Body tem outros usos. Se precisarmos, por exemplo, capturar só uma 
+parte de um objeto que foi enviado no body podemos passar o nome da chave desta 
+parte do objeto e o Nest captura apenas este valor. Vejamos o objeto abaixo:
+
+{
+    numeroPedido: 23123
+    produtos: [
+        {
+          nome: "camiseta nerd 2077",
+          preco: 24.90
+        }
+    ]
+}
+
+Se quiséssemos capturar apenas a lista de produtos, poderíamos fazer 
+@Body('produtos') e o Nest nos daria apenas os produtos ignorando o restante dos 
+valores no objeto. Temos outros dois decoratos que se comportam de forma parecida 
+com o @Body. Eles são o @Query e o @Param, o primeiro lida com query parameters 
+e o segundo com parâmetros dinâmicos na URL. Veremos mais sobre estes outros 
+durante nossos estudos.

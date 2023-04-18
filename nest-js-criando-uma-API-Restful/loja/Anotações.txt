@@ -1,0 +1,695 @@
+Criar um projeto com Nest é bem fácil, o próprio framework disponibiliza uma 
+ferramenta de linha de comando (CLI) para que não tenhamos muito trabalho 
+instalando e configurando vários pacotes diferentes usando o NPM.
+
+Para criar um novo projeto Nest, tudo que precisamos fazer é usar o comando 
+abaixo no terminal, em um diretório de sua preferência, informando o nome 
+do projeto logo após o new. No nosso caso, o projeto se chamará loja.
+
+npx @nestjs/cli new loja
+
+Este comando pode demorar um pouco dependendo da sua conexão de internet, 
+isso por que ele vai criar uma nova pasta com o mesmo nome do projeto, 
+criar também o package.json que o Node precisa para gerenciar as 
+dependências do projeto e baixar todas as dependências necessárias 
+para a execução do Nest.
+
+Após este processo finalizar, podemos entrar na pasta do projeto e usar 
+o comando npm start para iniciar o projeto. Porém, como estamos em 
+desenvolvimento, é mais interessante que usemos o servidor de desenvolvimento, 
+já que este observa as mudanças que faremos nos arquivos e automaticamente 
+reinicia o servidor para que possamos testar nossas mudanças no navegador 
+ou no postman.
+
+Para iniciar o servidor de desenvolvimento, basta usar o comando 
+npm run start:dev. Lembre-se de parar o servidor anterior caso tenha iniciado. 
+Você pode fazer isso com o atalho de teclado CTRL + C no terminal.
+
+O Servidor estará ouvindo requisições na porta 3000, então podemos acessar 
+http://localhost:3000 e veremos uma mensagem de Hello World. Experimente 
+brincar um pouco com o Nest modificando esta mensagem que está no 
+App.service.ts.
+
+---------------------------------------------------------------------------------
+
+Compreender o que é o Nest, e assim saber algumas de suas características.
+A usar a CLI do Nest, para criar projetos.
+Usar o npm para iniciar o servidor de do Nest para receber requisições.
+
+---------------------------------------------------------------------------------
+
+O Time do Alex está usando Nest em seu projeto para salvar os produtos de uma 
+compra. O código do controller que recebe os dados é semelhante ao que se 
+encontra abaixo. Porém, os dados não estão sendo salvos corretamente. 
+Analise abaixo:
+
+@Controller('/compras')
+export class CompraController {
+    construtor(private compraRepository: CompraRepository){}
+
+    @Post()
+    async registra(produtos: Produto[]) {
+         this.compraRepository.salva(produtos);
+    }
+}
+
+Assinale a alternativa que justifica o motivo dos dados não estarem sendo salvos 
+corretamente:
+
+R: O parâmetro produtos no método registra, não tem nenhum decorator indicando 
+de onde o Nest deve buscar o valor, o correto seria decorar esse parâmetro 
+com @Body.
+Sem o decorator @Body, o Nest não sabe de onde buscar o valor desejado para o 
+parâmetro do método. Neste caso, estamos pedindo para o Nest popular o parâmetro 
+produtos com o que vier no body da requisição.
+
+---------------------------------------------------------------------------------
+
+O Nest possui outros decorators para capturar dados a partir de uma requisição, 
+inclusive o @Body tem outros usos. Se precisarmos, por exemplo, capturar só uma 
+parte de um objeto que foi enviado no body podemos passar o nome da chave desta 
+parte do objeto e o Nest captura apenas este valor. Vejamos o objeto abaixo:
+
+{
+    numeroPedido: 23123
+    produtos: [
+        {
+          nome: "camiseta nerd 2077",
+          preco: 24.90
+        }
+    ]
+}
+
+Se quiséssemos capturar apenas a lista de produtos, poderíamos fazer 
+@Body('produtos') e o Nest nos daria apenas os produtos ignorando o restante dos 
+valores no objeto. Temos outros dois decoratos que se comportam de forma parecida 
+com o @Body. Eles são o @Query e o @Param, o primeiro lida com query parameters 
+e o segundo com parâmetros dinâmicos na URL. Veremos mais sobre estes outros 
+durante nossos estudos.
+
+---------------------------------------------------------------------------------
+
+O Nest, em toda a sua documentação, estrutura seus exemplos sempre pensando em 
+módulos. É uma ideia muito inspirada na arquitetura do Angular, inclusive, a 
+estrutura e configurações são quase idênticas, com alguns ajustes.
+
+A documentação às vezes deixa a entender que é uma boa ideia seguir pelo caminho 
+de feature modules, onde cada feature do seu projeto deve ser isolada em um 
+módulo; porém, pode ser uma estrutura de granularidade muito pequena - e isso 
+pode variar de projeto para projeto.
+
+No geral, acredito que cada módulo deve ser pensado de forma isolada, com poucas 
+dependências, a fim de que se um dia precisarmos separar módulos dessa aplicação 
+em aplicações diferentes, seguindo o caminho dos microserviços, possamos ter a 
+facilidade de fazer isso com pouco esforço. Então, daí, temos a ideia de 
+monólitos modulares, onde teremos uma aplicação monolítica, porém estruturada 
+em partes com bom encapsulamento e baixo acoplamento.
+
+Estruturar aplicações é uma arte da engenharia que sempre está em evolução. 
+Então, não se apegue muito a estruturas, pois no geral as recomendações de cada 
+framework são boas. Assim, segui-las no início é muito útil para aprender como 
+cada coisa funciona, mas cada projeto tem suas necessidades. Decida com seu 
+time o melhor caminho!
+
+---------------------------------------------------------------------------------
+
+A Injeção de dependências é um mecanismo que faz muito uso dos conceitos do 
+SOLID, principalmente do princípio D, de Dependency Inversion, em que uma classe 
+deveria depender de uma interface comum, sendo que qualquer objeto que implemente
+essa interface é um objeto aceitável para uso na classe onde ele foi inserido.
+
+Nosso controller, por exemplo, recebe um objeto específico de repositório, 
+e isso nos dá pouca flexibilidade. Porém, se usássemos uma interface como 
+dependência para nosso controller, poderíamos em tempo de desenvolvimento 
+usar um repositório que armazena os dados na memória, como já fizemos. Mas, 
+em teste ou em produção, poderíamos usar um outro repositório que salva de 
+fato os dados em um banco de dados como o MySQL.
+
+Vale lembrar que para que o Nest consiga injetar uma dependência de uma classe, 
+a classe que será injetada deve estar presente no módulo como um provider e 
+decorada com o @Injectable.
+
+SOLID é um assunto que sempre dá para se estender nas discussões, há livros 
+e mais livros que explicam e exemplificam cada um dos conceitos. Ficou curioso? 
+O Livro do Alexandre Aquiles da Casa do Código pode esclarecer muito sobre o 
+assunto. O Livro do Maurício Aniche também. Confira as referências deles a seguir:
+
+Orientação a Objetos e SOLID para Ninjas: Projetando classes flexíveis
+Desbravando SOLID: Práticas avançadas para códigos de qualidade em Java moderno
+PS: Ambos os livros usam Java em seus exemplos, mas ainda é uma boa leitura.
+
+---------------------------------------------------------------------------------
+
+Antes de começar a fazer todo o cadastro de usuário, certifique-se que apagou os 
+arquivos que não vamos precisar para o nosso projeto. São estes: app.service.ts, 
+o app.e2e-spec.ts e app.controller.ts que estão dentro de src. Também apague as 
+referências para estes arquivos dentro do app.module.ts. O app.module.ts deve 
+ficar como o código abaixo:
+
+import { Module } from '@nestjs/common';
+
+@Module({
+  imports: [],
+})
+export class AppModule {}COPIAR CÓDIGO
+Depois disso, estamos prontos para iniciar! Sabemos que para tornar possível 
+cadastrar um usuário, precisamos de uma rota que possa receber os dados do 
+usuário via POST. Para isso, precisamos de um controller.
+
+Vamos criar uma nova pasta dentro de src para agruparmos códigos que lidam 
+com o usuário, o nome dessa pasta será usuario e dentro dela, criaremos dois 
+arquivos, estes são: usuario.controller.ts e usuario.module.ts. O controller 
+terá um código semelhante a este:
+
+import { Body, Controller, Post } from "@nestjs/common";
+
+@Controller('/usuarios')
+export class UsuarioController {
+
+    @Post()
+    async criaUsuario(@Body() dadosDoUsuario) {
+                return dadosDoUsuario;
+    }
+
+}COPIAR CÓDIGO
+O módulo de usuário por outro lado, será apenas uma classe com o decorator 
+@Module() adicionando nosso controller na configuração de controllers do
+ módulo.
+
+import { Module } from "@nestjs/common";
+import { UsuarioController } from "./usuario.controller";
+
+@Module({
+    controllers: [UsuarioController],
+})
+export class UsuarioModule {}COPIAR CÓDIGO
+Com isso, estamos quase prontos para receber dados via POST no endereço 
+localhost:3000/usuarios. O último ponto é adicionar nosso módulo de usuário 
+na árvore de módulos da aplicação Nest, como ilustra o código abaixo do 
+arquivo app.module.ts:
+
+import { Module } from '@nestjs/common';
+import { UsuarioModule } from './usuario/usuario.module';
+
+@Module({
+  imports: [UsuarioModule],
+})
+export class AppModule {}COPIAR CÓDIGO
+Ainda precisamos, de alguma forma, salvar os dados do usuário em nosso 
+banco em memória. Para isso, criaremos nosso repositório de usuários, o nome 
+do arquivo será usuario.repository.ts e ficará dentro da mesma pasta do 
+controller de usuário:
+
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export class UsuarioRepository {
+    private usuarios = [];
+
+    async salvar(usuario) {
+        this.usuarios.push(usuario);
+    }
+}COPIAR CÓDIGO
+Também precisamos adicionar o nosso repositório dentro do módulo de usuário, 
+para que o Nest consiga injetar objetos dessa classe em nosso controller:
+
+import { Module } from "@nestjs/common";
+import { UsuarioController } from "./usuario.controller";
+import { UsuarioRepository } from "./usuario.repository";
+
+@Module({
+    controllers: [UsuarioController],
+    providers: [UsuarioRepository]
+})
+export class UsuarioModule {}COPIAR CÓDIGO
+Agora, em nosso controller, podemos receber o repositório através do 
+construtor e usar o método salvar ao receber os dados do usuário.
+
+@Post()
+async criaUsuario(@Body() dadosDoUsuario) {
+    this.usuarioRepository.salvar(dadosDoUsuario);
+    return dadosDoUsuario;
+}COPIAR CÓDIGO
+Ótimo, já podemos cadastrar usuários, agora precisamos listá-los. 
+Como fazer isso?
+
+As mudanças que precisamos fazer são mínimas. Primeiro, precisamos 
+devolver a lista de usuários que foram salvos no nosso usuario.repository.ts 
+com um método novo que chamaremos de listar:
+
+async listar() {
+    return this.usuarios;
+}COPIAR CÓDIGO
+E em nosso usuario.controller.ts faremos um novo método que responde por GET 
+e usa o método listar para devolver a lista de usuários que é retornada pelo 
+repositório.
+
+@Get()
+    async listUsuarios() {
+    return this.usuarioRepository.listar();
+}COPIAR CÓDIGO
+Agora podemos tanto cadastrar, quanto listar usuários!
+
+---------------------------------------------------------------------------------
+
+Para o cadastro de produtos, teremos a mesma estrutura de arquivos e a lógica 
+será praticamente idêntica. Faremos da forma mais simples possível e vamos 
+ajustando conforme for necessário. Dito isso, replique a estrutura que usamos 
+para cadastrar usuários fazendo as devidas alterações para funcionar para produtos.
+
+Criaremos uma nova pasta chamada produto dentro de src e nela criaremos os 
+arquivos produto.controller.ts, produto.repository.ts e produto.module.ts.
+
+Teremos a rota que responde via GET e via POST. Quando recebermos um GET, 
+listaremos os produtos cadastrados, quando recebermos um POST, iremos capturar 
+os dados que vierem no corpo de requisição e salvar estes dados no repositório de 
+produtos.
+
+O JSON abaixo é um exemplo que apresenta todos os dados necessários para 
+cadastrar um produto:
+
+{
+    "nome": "Figura de ação Marvel Homem Aranha Olympus Homem Aranha E6358 de Hasbro Classic",
+    "valor": 70.0,
+    "quantidadeDisponivel": 10,
+    "descricao": "Produto novo, bem acabado, alegria para colecionadores",
+    "caracteristicas": [{
+        "nome": "Fabricante",
+        "descricao": "Iron Studios"
+    },{
+        "nome": "material",
+        "descricao": "Plástico"
+    }],
+    "imagens": [{
+        "url": "https://i.imgur.com/dwDZICq.jpg",
+        "descricao": "Imagem do Homem Aranha"
+    }],
+    "categoria": "Colecionáveis",
+    "dataCriacao": "2022-10-12T14:22:53.496Z",
+    "dataAtualizacao": "2022-10-12T14:22:53.496Z"
+}
+
+Note que temos o nome do produto, valor, quantidade disponível, descrição, 
+características, imagens, categoria e datas de criação e atualização 
+do produto.
+
+Não se preocupe ainda com a validação destas informações ou mesmo com a 
+associação de quem foi o usuário que cadastrou um produto específico. 
+Teremos uma atividade específica para isso.
+
+---------------------------------------------------------------------------------
+
+Criar rotas que respondem aos métodos GET e POST do HTTP usando os decorators 
+@Get, @Post em conjunto com o @Controller.
+Capturar dados que são enviados no corpo da requisição POST com o decorator @Body.
+Criar módulos no Nest.
+Usar a injeção de dependências com o @Injectable e configurando corretamente 
+as classes no módulo.
+
+---------------------------------------------------------------------------------
+
+A Juliana, que está entrando no time e projeto em que você está desenvolvendo 
+com NestJS, precisa escrever uma validação que verifica se um valor número foi 
+enviado para API e ela está com dúvidas de como fazer isso. Qual das alternativas 
+abaixo descreve a melhor forma da Juliana fazer essa validação?
+
+R: Criar um DTO que descreve os dados que serão recebidos pelo endpoint e 
+habilitar o pipe de validação globalmente na aplicação.
+O DTO faria o papel de descrever os atributos que serão recebidos pelo Controller 
+e habilitar o Pipe de validação global, faz a validação acontecer automaticamente.
+
+---------------------------------------------------------------------------------
+
+Criar DTOs é muito comum em vários tipos de projetos independente da linguagem 
+ou do framework. Muitas vezes esses objetos podem aparecer com outros sufixos 
+como Request, Form.
+
+No geral, é apenas um objeto que define a interface entre duas camadas, 
+normalmente, nas bordas mais externas das aplicações, ou seja, para indicar 
+os campos e tipos permitidos nas entradas da aplicação; e claro, também é 
+recomendado para definir as saídas.
+
+A sigla é um acrônimo para Data Transfer Object, que quer dizer basicamente 
+um objeto de transferência de dados. Por isso, ele é um objeto que também 
+pode ser usado como base para validar os dados a serem recebidos por nossa 
+aplicação.
+
+Criar DTOs pode parecer trabalhoso ou mesmo chato, mas ele desempenha um
+ papel importante no conjunto de boas práticas de desenvolvimento de 
+ software.
+
+ ---------------------------------------------------------------------------------
+
+ Para validar produtos, precisamos quebrar o problema dessa validação em partes. 
+ Primeiro, vamos relembrar como é o JSON que precisamos enviar para cadastrar um produto:
+
+{
+    "nome": "Figura de ação Marvel Homem Aranha Olympus Homem Aranha E6358 de 
+    Hasbro Classic",
+    "valor": 70.0,
+    "quantidadeDisponivel": 10,
+    "descricao": "Produto novo, bem acabado, alegria para colecionadores",
+    "caracteristicas": [{
+        "nome": "Fabricante",
+        "descricao": "Iron Studios"
+    },{
+        "nome": "material",
+        "descricao": "Plástico"
+    }],
+    "imagens": [{
+        "url": "https://i.imgur.com/dwDZICq.jpg",
+        "descricao": "Imagem do Homem Aranha"
+    }],
+    "categoria": "Colecionáveis",
+    "dataCriacao": "2022-10-12T14:22:53.496Z",
+    "dataAtualizacao": "2022-10-12T14:22:53.496Z"
+}COPIAR CÓDIGO
+Claramente, podemos quebrar esse JSON em algumas partes. Podemos observar que 
+qualquer chave do JSON que tem uma lista como valor pode ser representada como uma 
+classe diferente. Um exemplo seria as características de um produto que possuem, por 
+enquanto, o nome do fabricante e o material do qual é feito o produto. 
+Poderíamos separar isso em uma classe:
+
+export class CaracteristicaProdutoDTO {
+  nome: string;
+  descricao: string;
+}COPIAR CÓDIGO
+A mesma ideia é válida para a validação das Imagens do produto. Isso nos geraria 
+uma classe CriaProdutoDTO parecida com a que se encontra abaixo:
+
+export class CriaProdutoDTO {
+  nome: string;
+  valor: number;
+  quantidade: number;
+  descricao: string;
+  caracteristicas: CaracteristicaProdutoDTO[];
+  imagens: ImagemProdutoDTO[];
+  categoria: string;
+}COPIAR CÓDIGO
+A pergunta que fica é: como fazer o pipe validar um atributo que na verdade é 
+uma lista de objetos de outra classe que também possui suas próprias validações? 
+O class-validator nos ajuda nisso também.
+
+Primeiro, precisamos validar que deve ser uma lista, ou melhor, um array. Para 
+isso temos o decorator @IsArray(). Segundo, precisamos dizer para o class-validator
+ que ele deve validar o objeto que está sendo referenciado pelo atributo, ou seja, 
+ precisa fazer a validação aninhada ao atributo validado, para isso usaremos o 
+ decorator @ValidateNested().
+
+E, por último, precisamos informar o tipo do objeto ao qual o atributo faz 
+referência, para transformar o objeto do atributo no tipo correto e para isso 
+usaremos o decorator @Type() que por parâmetro espera uma função que retorne o 
+tipo ao que o atributo está se referindo.
+
+Juntando tudo, teremos uma validação que segue o seguinte formato para as 
+características do produto:
+
+@ValidateNested()
+@IsArray() 
+@Type(() => CaracteristicaProdutoDTO)
+caracteristicas: CaracteristicaProdutoDTO[];COPIAR CÓDIGO
+Com isso em mente, crie a validação de criação de produtos. Elas precisam 
+atender aos critérios abaixo:
+
+O nome do produto não pode ser vazio;
+O valor do produto precisa ser um número positivo (não pode ser zero) e ter 
+até duas casas decimais;
+A quantidade precisa ser um número igual ou maior que zero;
+A descrição não pode ser vazia ou maior que 1000 caracteres;
+A lista de características do produto precisa ter pelo menos 3 itens;
+A lista de imagens do produto precisa ter pelo menos 1 item;
+A categoria do produto não pode ser vazia.
+Algumas dessas validações não exploramos aqui, mas estão todas descritas na 
+documentação do class-validator que você pode acessar neste link.
+
+---------------------------------------------------------------------------------
+
+O que são Pipes e seus casos de uso;
+Como habilitar o pipe de validação global do Nest;
+Como validar dados de requests com DTOs usando decorators do 
+class-validator e class-transformer;
+Validações mais complexas com objetos aninhados e arrays.
+
+
+---------------------------------------------------------------------------------
+
+O Ronaldo estava discutindo com seus colegas de trabalho sobre validações 
+síncronas e assíncronas e ao ser indagado sobre quais os limites das validações 
+síncronas, o mesmo respondeu de uma forma que gerou mais dúvidas do que sanou. 
+Das alternativas abaixo, qual delas descreve bem os limites da validação síncrona:
+
+R: É uma boa prática sempre usar uma validação assíncrona quando não conseguimos 
+validar determinado dado de forma isolada. Se precisarmos consultar um terceiro, 
+por exemplo, devemos fazer isso de forma assíncrona para não gerar uma trava nos 
+processos onde as validações são enfileiradas por estarem segurando requisições HTTP.
+As requisições HTTP ainda serão enfileiradas, afinal as respostas precisam ser 
+devolvidas para o cliente, porém, o Node sabe lidar com isso e gerência os recursos 
+para conseguir responder bem mesmo em grandes volumes de requisição, mas é nosso 
+papel saber usar estes recursos.
+
+---------------------------------------------------------------------------------
+
+Estudamos vários decorators do Nest até o momento, mas você sabia que um decorator 
+é apenas uma função como qualquer outra? Claro, dependendo do tipo de decorator 
+que estamos criando, ele pode ser mais ou menos complexo de entender e escrever.
+
+Isso porque temos decorators que podem ser usados a nível de classe como o 
+@Controller do Nest. Vimos também os de nível de método como o @Get e outros 
+decorators de HTTP que o Nest nos provê e temos também o decorator de propriedade 
+que são todos que usamos em nossos validadores.
+
+Quer saber como criar seus próprios decorators do zero? Aqui na Alura temos um 
+curso de Typescript que ensina isso e muito mais, é um curso mais avançado, 
+então verifique se tem os pré-requisitos certinhos:
+
+---------------------------------------------------------------------------------
+
+Validar que um e-mail já foi usado por outro usuário da nossa lógica precisa 
+ser feito de forma assíncrona, visto que precisamos ir até o banco de dados 
+ou mesmo outro serviço e esperar uma resposta.
+
+Dito isso, crie um novo provider, que decorado com 
+@ValidatorConstraint({ async: true }), implemente a interface 
+ValidatorConstraintInterface. Este provider também deve receber como dependência 
+no construtor o repositório de usuários, afinal, é o repositório que faz interação 
+com o banco de dados.
+
+A interface ValidatorConstraintInterface no seu método validate, espera que 
+retornemos um valor booleano que indique se a validação foi um sucesso ou não. 
+Se retornarmos o valor false, o erro de validação deve ser apresentado.
+
+Para criar o decorator que executa a validação personalizada que acabamos de 
+descrever, precisamos criar uma função. O nome desta função será o nome do decorator. 
+E, como parâmetro, essa função deve receber um objeto do tipo ValidationOptions, 
+interface importada do pacote class-validator.
+
+Nossa função decorator deve retornar como resultado uma nova função que tem 
+como parâmetros o objeto a ser validado e o nome da propriedade que será validada.
+
+Esta segunda função deve executar o registro deste decorator no class-validator 
+
+por meio do uso da função registerDecorator que recebe como argumento um objeto, 
+informando o target alvo da validação, a propriedade a ser validada, as opções de 
+validação, as constraints e por último o validator (classe que já escrevemos antes).
+
+Validações assíncronas normalmente são mais complexas, envolvem mais partes da aplicação. 
+Caso precise de uma implementação de referência, você pode consultar este commit.
+
+---------------------------------------------------------------------------------
+
+Criar uma validação assíncrona para aplicar validações complexas;
+Criar um decorator para aplicar validações customizadas;
+Usar o gestor de dependência do Nest para injetar objetos nas validações customizadas.
+
+---------------------------------------------------------------------------------
+
+Para atualizar um recurso em uma API Restful, temos dois métodos HTTP disponíveis, 
+eles são o PUT e o PATCH. Qual usar?
+
+De acordo com a especificação, o método PATCH deve ser utilizado para atualizar 
+um recurso de forma parcial, ou seja, sem precisar informar todos os dados. 
+Vejamos o exemplo abaixo de um recurso que representa um curso na Alura:
+
+{
+    "nome": "JavaScript Avançado",
+    "nivel": "Avançado",
+    "cargaHorariaEmHoras": 8
+}COPIAR CÓDIGO
+Para atualizar o nome apenas, usando o método PATCH, deveríamos 
+enviar apenas o dado a ser atualizado, neste caso:
+
+{
+    "nome": "JavaScript Avançado: Programando de forma funcional"
+}COPIAR CÓDIGO
+Por outro lado, para atualizar o mesmo objeto usando o método PUT, 
+deveríamos enviar o objeto completo, inclusive com os dados que não 
+vamos atualizar. Dessa forma, para atualizar o nome do curso, o corpo 
+da requisição seria o exemplificado abaixo:
+
+{
+"nome": "JavaScript Avançado: Programando de forma funcional",
+    "nivel": "Avançado",
+    "cargaHorariaEmHoras": 8
+}COPIAR CÓDIGO
+Para estarmos 100% alinhados com a especificação, deveríamos implementar 
+as duas formas, muitas APIs implementam, outras não. Outras permitem você 
+atualizar um recurso de forma parcial usando o PUT. Essa variação não é 
+um problema, pois os times que implementaram essas APIs devem ter decidido 
+isso seguindo algum critério.
+
+---------------------------------------------------------------------------------
+
+Para finalizar nosso CRUD, precisamos permitir a atualização dos dados de um 
+usuário e também a remoção desse usuário da nossa aplicação. Antes disso, vamos 
+fazer dois pequenos incrementos na nossa aplicação.
+
+O primeiro desses incrementos é criar uma representação real do que é um usuário 
+na nossa aplicação, a entidade usuário. Essa classe possui como atributos o nome, 
+email, senha e id do usuário. Por fim, devemos usar essa entidade nos lugares onde 
+lidamos com o usuário, ou seja, no repositório. A inicialização do nosso array de 
+usuários deve ficar como se encontra abaixo:
+
+private usuarios: UsuarioEntity[] = [];COPIAR CÓDIGO
+Há mais lugares onde podemos usar nossa entidade de usuário como no controller, 
+ao criar um usuário novo a partir do DTO de criação de usuário.
+
+O segundo incremento é criar um novo DTO responsável por representar um usuário 
+em nossa listagem; este deve apenas exibir o id e o nome do usuário. E atenção: 
+já devemos refatorar nossa listagem de usuários para usar este novo DTO.
+
+Para atualizar um usuário, precisamos criar um novo DTO, muito parecido com o 
+de criação de usuário, porém, com todos os campos opcionais. Afinal, não sabemos 
+quais campos o usuário irá atualizar. Contudo, caso o campo seja enviado, ele 
+precisa passar pelas mesmas validações de criação de um usuário novo, ou seja, 
+o e-mail não pode ter sido usado por outro usuário, etc.
+
+Para validar um campo de forma opcional, podemos usar o decorator @IsOptional 
+do class-validator como no exemplo abaixo:
+
+@MinLength(6, { message: 'A senha precisa ter pelo menos 6 caracteres' })
+@IsOptional()
+senha: string;COPIAR CÓDIGO
+Além disso, precisamos ter o cuidado de não permitir que o usuário atualize o 
+próprio id no repositório, visto que vamos receber como parâmetro um objeto 
+parcial de um usuário no método atualiza:
+
+async atualiza(id: string, dadosDeAtualizacao: Partial<UsuarioEntity>) {}
+Para remover um usuário, o processo é um pouco mais simples: precisamos 
+apenas do ID do usuário enviado como parâmetro na URL usando o método DELETE.
+
+ @Delete('/:id')
+ async removeUsuario(@Param('id') id: string) {}COPIAR CÓDIGO
+Um ponto de atenção importante é que tanto na atualização dos dados do usuário, 
+ na remoção, precisamos retornar como resposta um objeto com uma mensagem 
+ indicando se o usuário foi removido ou atualizado, assim como os dados desse 
+ usuário, algo semelhante ao que se encontra abaixo:
+
+return {
+   usuario: usuarioRemovido,
+  messagem: 'usuário removido com suceso',
+};
+
+---------------------------------------------------------------------------------
+
+Chegou o momento de replicar tudo que fizemos para finalizar o CRUD de usuários, 
+para produtos. Segue uma lista simples com tudo que precisamos fazer:
+
+Criar a entidade de produto, essa será idêntica ao CriaProdutoDTO que já 
+escrevemos antes; porém, com um atributo extra, o ID do produto que será um UUID;
+Usar a entidade de produto nos métodos do repositório de produtos;
+Ajustar o código do controller de produtos para que o mesmo crie um objeto da entidade 
+produto ao tentar salvar um produto no repositório;
+Criar o DTO de atualização de produto; este é idêntico ao de criação de produto, porém, 
+com todos os campos opcionais com exceção do id do produto e o id do usuário;
+Escrever o método atualiza no repositório de produto, no qual, dado um id e os dados de 
+atualização de um produto, o método atualiza os valores que foram recebidos, filtrando o id
+ do produto e do usuário, sendo que estes valores não podem ser atualizados;
+Criar o método atualiza no controller de produto que responde ao método HTTP Put, que recebe 
+como parâmetro de URL o id do produto a ser atualizado e como corpo da requisição os dados do 
+produto com as validações já presentes no DTO. E assim haver o retorno ao final de uma mensagem 
+que informa que o produto foi atualizado com sucesso, assim como os dados do produto;
+Escrever o método remove no repositório, no qual, dado um id, busca o produto e o remove da 
+lista de produtos, retornando ao final os dados do produto removido;
+Escrever o método remove no controller de produtos que recebe como parâmetro de URL o id do 
+produto e executa a remoção do produto, e retorna como resposta uma mensagem informando que o 
+produto foi removido, assim como os dados do produto. Este método no controller deve responder
+ao método DELETE do HTTP.
+
+---------------------------------------------------------------------------------
+
+ Um ponto importante na evolução de APIs Restful é como lidamos com a evolução 
+ dessas APIs. Uma API precisa se manter estável quando em produção com clientes 
+ fazendo uso de seus recursos. Diante disso, não é recomendável que simplesmente 
+ removamos valores ou alteremos como determinado recurso funciona, pois os clientes 
+ dessa API podem parar de funcionar de forma inesperada.
+
+Claro, se é uma API privada, onde as alterações são negociadas entre as partes, 
+este é um problema mais fácil de lidar. Mas em APIs públicas, como a do GitHub e 
+outros serviços, essa é uma problemática para se ter cuidado.
+
+Por isso, existem maneiras de lidar com essa evolução. Uma delas é o versionamento 
+da API. Em casos em que determinado endpoint precise de mudanças, cria-se uma versão 
+nova daquele mesmo endpoint onde essas mudanças serão aplicadas.
+
+Este versionamento pode acontecer de algumas formas, a mais comum delas é a adição de 
+um sub-caminho para o recurso, que especifica que versão está sendo usada daquela API. 
+O exemplo abaixo ilustra melhor:
+
+https://api.alura.com.br/v2/cursosCOPIAR CÓDIGO
+O v2 presente na URL do endpoint indica a versão da API que estamos utilizando. Outra 
+forma é usando query parameters, enviando também na URL, qual a versão da API que estamos 
+usando:
+
+https://api.alura.com.br/cursos?v=2COPIAR CÓDIGO
+Por último, podemos usar cabeçalhos do HTTP para indicar para o servidor qual versão 
+queremos usar da API. Normalmente, o cabeçalho usado é o Accept, mas pode ser um outro. 
+O NestJS já possui um mecanismo que lida com o versionamento das APIs, facilitando a 
+gestão desses endpoints.
+
+Caso queira saber mais sobre as possibilidades de versionamento da API com Nestjs, a 
+documentação possui uma página para explicar as formas suportadas por ele. Você pode 
+ler mais neste link.
+
+O que precisa ficar claro também é que conforme uma API evolui e publica mais versões 
+de seus endpoints, mais complexo fica gerenciar a API em si. Cada endpoint evolui de 
+forma independente, o que pode gerar situações onde um endpoint nunca precisou mudar, 
+por isso, sempre esteve na sua versão original e outros endpoints que podem ter 3 ou 
+4 versões diferentes.
+
+---------------------------------------------------------------------------------
+
+Em APIs Restful, você pode ter endpoints isolados, ou seja, lidam com as operações 
+de CRUD de forma isolada sob um recurso só e endpoints que lidam com relacionamentos 
+ou agregações.
+
+Nos endpoints que lidam com relacionamentos/agregações, dependendo do tipo de 
+relacionamento, a recomendação geral é que esse relacionamento seja expresso também nas 
+URLs dos recursos.
+
+Vejamos nosso exemplo da loja: Um usuário possui produtos. Sendo assim, os produtos 
+da loja estão com um relacionamento forte com seus usuários. De fato, o usuário cria e 
+remove produtos como bem entender. Sendo assim, a recomendação geral é que o CRUD de 
+produtos tivesse endpoints relativos ao de usuários. O que isso quer dizer na prática? 
+A URL a seguir demonstra a relação entre produtos e usuário:
+
+http://localhost:3000/usuarios/1234/produtosCOPIAR CÓDIGO
+O número 1234 na URL representa o usuário com aquele identificador. O /produtos logo 
+após o identificador de usuário, representa o endpoint raiz de operações do CRUD para 
+produtos daquele usuário. Considerando isso, teríamos o seguinte esquema de CRUD para 
+produtos:
+
+POST http://localhost:3000/usuarios/1234/produtos, para criar um produto;
+GET http://localhost:3000/usuarios/1234/produtos, para listar todos os produtos;
+PUT/PATCH http://localhost:3000/usuarios/1234/produtos/4321, para atualizar um produto;
+DELETE http://localhost:3000/usuarios/1234/produtos, para remover um produto.
+Durante nossas aulas, não seguimos este padrão para simplificar a construção geral da 
+nossa loja. É importante ter isso em mente: não seguir uma recomendação ou um padrão 
+precisa ser uma escolha consciente sobre os impactos dessa escolha.
+
+---------------------------------------------------------------------------------
+
+Usar o @PUT para atualizar um recurso na API.
+Usar o @Delete para remover um recurso da API.
+Criamos entidades para isolar objetos importantes do nosso contexto de negócio.
+Usar o padrão DTO para isolar objetos de entrada e saída da nossa API.
+Usar o @IsOptional para validar dados caso eles sejam enviados no corpo da requisição.
