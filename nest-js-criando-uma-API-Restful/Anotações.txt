@@ -1,3 +1,7 @@
+docker-compose up -d
+
+---------------------------------------------------------------------------------
+
 Criar um projeto com Nest é bem fácil, o próprio framework disponibiliza uma 
 ferramenta de linha de comando (CLI) para que não tenhamos muito trabalho 
 instalando e configurando vários pacotes diferentes usando o NPM.
@@ -86,3 +90,38 @@ valores no objeto. Temos outros dois decoratos que se comportam de forma parecid
 com o @Body. Eles são o @Query e o @Param, o primeiro lida com query parameters 
 e o segundo com parâmetros dinâmicos na URL. Veremos mais sobre estes outros 
 durante nossos estudos.
+
+---------------------------------------------------------------------------------
+
+Podemos utilizar diferentes módulos no NestJS para lidar com diversos 
+componentes, dependendo dos recursos que queremos utilizar durante o nosso 
+desenvolvimento.
+
+Sabendo disso, por qual motivo é necessário utilizar o módulo config?
+
+Para colocar valores sensíveis, a fim de não deixá-los expostos no código.
+
+Justamente, a ideia é que não deixemos informações sensíveis no código. 
+Com isso, aumentamos a segurança e também impedimos a exposição dos dados no 
+sistema de versionamento.
+
+---------------------------------------------------------------------------------
+
+O curso ORM com NodeJS: API com Sequelize e MySQL explora o uso de 
+ORM (Object-Relational Mapping) com JavaScript, desde a configuração do 
+projeto até a criação de rotas para manipulação de dados do banco de dados, 
+demonstrando como o uso de ORM pode simplificar o processo de criação de 
+APIs em NodeJS.
+
+https://cursos.alura.com.br/course/orm-nodejs-api-sequelize-mysql
+
+---------------------------------------------------------------------------------
+
+Como o conceito de ORM facilita bastante a integração com o banco, 
+considerando que várias consultas acabam sendo abstraídas por ele;
+A configurar o TypeORM para implementar o conceito de ORM dentro da 
+nossa aplicação;
+A adicionar o módulo config do NestJS no nosso projeto, evitando, assim, 
+que informações sensíveis fiquem no meio do código.
+
+
