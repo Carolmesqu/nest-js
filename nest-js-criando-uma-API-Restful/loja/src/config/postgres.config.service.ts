@@ -20,7 +20,9 @@ export class PostgresConfigService implements TypeOrmOptionsFactory {
             username: this.configService.get<string>('DB_USERNAME'),
             password: this.configService.get<string>('DB_PASSWORD'),
             database: this.configService.get<string>('DB_NAME'),
-            entities: [],
+            // Da forma que escrevemos abaixo, estamos dizendo para ele voltar para o diretorio default e a partir dele acessa uma página
+            // e depois disso acesse os arquivos que tenha .entity
+            entities: [__dirname + '/../**/*.entity{.js,.ts}'],
             synchronize: true
         }
     }

@@ -693,3 +693,185 @@ Usar o @Delete para remover um recurso da API.
 Criamos entidades para isolar objetos importantes do nosso contexto de negócio.
 Usar o padrão DTO para isolar objetos de entrada e saída da nossa API.
 Usar o @IsOptional para validar dados caso eles sejam enviados no corpo da requisição.
+
+---------------------------------------------------------------------------------
+
+Preparando o ambiente: configurando o Datasource
+
+Para configurar o Datasource, o pré-requisito é apenas ter o typeORM e o 
+módulo @nestjs/config já configurados. Com isso, basta seguir as instruções 
+abaixo:
+
+Na pasta src, crie uma pasta config e, dentro dela, crie um arquivo com o 
+nome postgres.config.service.ts. Um detalhe interessante aqui é o seguinte: 
+caso queira trabalhar com outro banco, é legal que o arquivo tenha o nome 
+respectivo ao banco e/ou db.config.service.ts, que seria um nome genérico.
+
+Feito isso, basta colar o conteúdo abaixo no arquivo criado anteriormente:
+
+    import { Injectable } from '@nestjs/common';
+    import { ConfigService } from '@nestjs/config';
+    import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from 
+    '@nestjs/typeorm';
+    
+    @Injectable()
+    export class PostgresConfigService implements TypeOrmOptionsFactory {
+    
+      constructor(private configService: ConfigService) {}
+    
+      createTypeOrmOptions(): TypeOrmModuleOptions {
+        return {
+          type: 'postgres',
+          host: this.configService.get<string>('DB_HOST'),
+          port: this.configService.get<number>('DB_PORT'),
+          username: this.configService.get<string>('DB_USERNAME'),
+          password: this.configService.get<string>('DB_PASSWORD'),
+          database: this.configService.get<string>('DB_NAME'),
+          entities: [],
+          synchronize: true,
+        };
+      }
+    }
+
+Agora, precisamos que você instale a lib para conectar ao seu banco de 
+dados. No curso, utilizamos o postgres, portanto, vamos adicioná-lo 
+ao nosso projeto com o comando npm install pg.
+
+    Caso queira utilizar outro banco, basta instalar o conector 
+    relativo.
+
+Na sequência, basta adicionar nos imports do arquivo app.module.ts o 
+seguinte código:
+
+   TypeOrmModule.forRootAsync({
+     useClass: PostgresConfigService,
+     inject: [PostgresConfigService]
+   }),
+
+O código acima também deve ser adicionado nos devidos imports 
+relacionados - o nome da classe vai depender do nome do seu arquivo.
+
+E, por último, não se esqueça de adicionar as variáveis no seu 
+arquivo .env.
+
+---------------------------------------------------------------------------------
+
+ Preparando o ambiente: configurando o pgAdmin
+
+ 
+
+Após executar o pgAdmin utilizando o docker-compose, você deve configurá-lo. 
+Para isso, basta seguir os passos abaixo:
+
+Acesse, no seu navegador, o endereço http://localhost:8081. Você deverá 
+inserir o email e a senha que estão nas variáveis de ambiente DB_ADMIN_EMAIL 
+e DB_PASSWORD, respectivamente, do arquivo .env.
+
+Na sequência, você deve clicar em “Add New Server”, definir um nome e 
+clicar em “Connection”.
+
+Em “Connection”, basta colocar as seguintes informações:
+
+    Host: postgres
+    Porta: manter a 5432
+    Username: root (ou o configurado no seu arquivo .env)
+    Password: root (ou o configurado no seu arquivo .env)
+
+Feito esses passos, basta salvar e acessar o novo servidor.
+
+Em seguida, expanda as opções do servidor que você acabou de criar (no 
+canto superior esquerdo) e clique com o botão direito em Databases.
+
+Agora, basta criar o banco; estamos usando como db_loja o nome, porém, 
+fica a seu critério.
+
+Com o banco criado, você pode rodar novamente a sua aplicação com npm 
+run start. Dessa vez, agora o Nest deve se conectar sem nenhum erro 
+com o Postgres!
+
+---------------------------------------------------------------------------------
+
+Nesta aula, conhecemos um pouco sobre Datasource e alguns padrões de acesso ao 
+dado. Entendemos que o Datasource é o banco de dados em si e que por meio dos 
+padrões de acesso conseguimos acessar o dado propriamente dito.
+
+Quais afirmações estão corretas?
+
+O sistema pode trabalhar com vários Datasources.
+É possível configurar vários Datasources em uma aplicação.
+Alternativa correta
+
+O padrão Repository traz um maior desacoplamento de regras.
+Com o Repository Pattern conseguimos desacoplar as regras de acesso ao dado 
+da entidade.
+
+---------------------------------------------------------------------------------
+
+O que é um Datasource e como nossa aplicação se comunica com o banco;
+Quais bancos(MySQL, PostgreSQL, SQL Server, Oracle - para citar alguns) 
+estão disponíveis dentro do TypeORM;
+Padrões de acesso ao dado, algo extremamente importante para acessarmos o 
+dado no banco dentro das melhores práticas.
+
+---------------------------------------------------------------------------------
+
+No vídeo anterior, indicamos o caminho das entidades para o Data Source do 
+TypeORM no arquivo postgres.config.service.ts com o seguinte código:
+
+entities: [__dirname + '/**/*.entity{.js,.ts}'],
+
+Contudo, um ajuste precisa ser feito. Troque o código acima para o seguinte:
+
+entities: [__dirname + '/../**/*.entity{.js,.ts}'],
+
+Isso porque o __dirname indica o diretório atual no qual o arquivo 
+postgres.config.service.ts se encontra, que é o config. Em seguida, na 
+string que estamos concatenando, a notação .. irá subir para o diretório pai, 
+que é o src. Depois, com a notação /**/*.entity{.js,.ts}, as entidades serão 
+buscadas dentro de qualquer pasta que esteja dentro de src, e cada entidade é 
+identificada como um arquivo que termina com .entity.js ou .entity.ts.
+
+Com isso, o TypeORM irá encontrar os arquivos de entidades com sucesso!
+
+Atenção: para os alunos que utilizam o Windows, existe um bug presente no 
+TypeORM a partir da versão 0.3.12, que tem a ver com a resolução desses caminhos.
+
+Para prevenir esse erro quando você fizer requisições para a API, você 
+pode atualizar a versão do TypeORM do projeto com o seguinte comando:
+
+npm install typeorm@0.3.11
+
+A discussão desse bug pode ser encontrada nesse tópico do GitHub.
+
+Caso você não queira alterar a versão do TyepORM no seu projeto, uma solução 
+alternativa é importar diretamente as entidades na lista entities.
+
+Outra solução para não ter esse bug é utilizar o WSL, já que no ambiente 
+Ubuntu não há esse problema de resolução de caminhos.
+
+---------------------------------------------------------------------------------
+
+Nesta aula, visitamos e aplicamos os conceitos de entidade nas nossas classes 
+pré-existentes. Entendemos que entidades são o "espelho" da nossa tabela.
+
+Sobre entidades, quais são as alternativas corretas? 
+
+A entidade representa o mapeamento relacional da tabela no código.
+Em uma entidade eu tenho todos os campos e os respectivos tipos que os 
+mesmos possuem no banco de dados.
+
+Para que o projeto consiga acessar todos os campos da tabela, necessariamente 
+esses campos precisam ser referenciados na entidade.
+De fato, para que minha aplicação conheça todos os campos utilizando o conceito 
+de ORM, é necessário que todos estejam mapeados na entidade.
+
+Para que o TypeORM entenda o local que as entidades estão, é preciso 
+referenciar no arquivo de configuração do Datasource.
+Precisamos configurar no arquivo de config o caminho da nossa pasta onde 
+estão as nossas entidades.
+
+---------------------------------------------------------------------------------
+
+O conceito de entidades, que representam o modelo da nossa tabela 
+no nosso código;
+A modelar as entidades que já tínhamos para adequar ao TypeORM.
