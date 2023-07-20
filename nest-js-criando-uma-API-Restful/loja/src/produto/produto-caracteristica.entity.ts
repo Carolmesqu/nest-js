@@ -2,6 +2,9 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 
 @Entity({ name: 'produtos_caracteristicas' })
 class ProdutoCaracteristica {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
     @Column({ name: 'nome', length: 128, nullable: false })
     nome: string;
 

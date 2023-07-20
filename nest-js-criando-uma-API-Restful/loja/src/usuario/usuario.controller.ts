@@ -9,6 +9,7 @@ import { UsuarioRepository } from './usuario.repository';
 import { v4 as uuid } from 'uuid';
 import { ListaUsuarioDTO } from './dto/ListaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/AtualizaUsuario.dto';
+import { UsuarioService } from './usuario.service';
 
 /**
  * Todo controller em Nest.js é decorado com um controller,
@@ -28,8 +29,9 @@ export class UsuarioController {
    */
 
   constructor(
-    private usuarioRepository: UsuarioRepository
-    ) {}
+    private usuarioRepository: UsuarioRepository,
+    private usuarioService: UsuarioService,
+  ) {}
 
   @Post()
   async criaUsuario(@Body() dadosDoUsuario: CriaUsuarioDTO) {
@@ -40,7 +42,9 @@ export class UsuarioController {
     //uuid é uma biblioteca de auto incremento de id
     usuarioEntity.id = uuid();
     
-  this.usuarioRepository.salvar(usuarioEntity);
+  // this.usuarioRepository.salvar(usuarioEntity); Antes estava assim
+    this.usuarioService.criaUsuario(usuarioEntity); 
+
     return { 
       usuario: new ListaUsuarioDTO(usuarioEntity.id, usuarioEntity.nome),
       message: 'usuário criado com sucesso' };
@@ -49,21 +53,27 @@ export class UsuarioController {
   //Metodo para listar usuarios
   @Get()
   async listaUsuarios() {
-    const usuariosSalvos = await this.usuarioRepository.listar();
-    const usuariosLista = usuariosSalvos.map(
-      usuario => new ListaUsuarioDTO(
-        usuario.id,
-        usuario.nome
-      )
-    );
+    // Antes de inserirmos a conexão com o banco estava assim 
+    // const usuariosSalvos = await this.usuarioRepository.listar();    
+    // const usuariosLista = usuariosSalvos.map(
+    //   usuario => new ListaUsuarioDTO(
+    //     usuario.id,
+    //     usuario.nome
+    //   )
+    // );
 
-    return usuariosLista;
+    // return usuariosLista;
+    
+    const usuariosSalvos = await this.usuarioService.listaUsuarios();
+
+    return usuariosSalvos;
   }
 
   //Metodo para atualizar usuario
   @Put('/:id')
   async atualizaUsuario(@Param('id') id: string, @Body() novosDados: AtualizaUsuarioDTO) {
-    const usuarioAtualizado = await this.usuarioRepository.atualiza(id, novosDados);
+    // const usuarioAtualizado = await this.usuarioRepository.atualiza(id, novosDados); como estava antes de alterarmos e fazermos a conexão com db
+    const usuarioAtualizado = await this.usuarioService.atualizaUsuario(id, novosDados);
     return {
       usuario: usuarioAtualizado,
       message: 'usuário atualizado com sucesso',
@@ -73,7 +83,7 @@ export class UsuarioController {
   //Metodo para deletar
   @Delete('/:id')
   async removeUsuario(@Param('id') id: string) {
-    const usuarioRemovido = await this.usuarioRepository.remove(id);
+    const usuarioRemovido = await this.usuarioService.deleteUsuario(id);
 
     return {
       usario: usuarioRemovido,

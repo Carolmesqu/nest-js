@@ -1,3 +1,6 @@
+Banco: docker-compose up -d
+Projeto: npm run start
+
 Criar um projeto com Nest é bem fácil, o próprio framework disponibiliza uma 
 ferramenta de linha de comando (CLI) para que não tenhamos muito trabalho 
 instalando e configurando vários pacotes diferentes usando o NPM.
@@ -875,3 +878,25 @@ estão as nossas entidades.
 O conceito de entidades, que representam o modelo da nossa tabela 
 no nosso código;
 A modelar as entidades que já tínhamos para adequar ao TypeORM.
+
+---------------------------------------------------------------------------------
+
+Nesta aula, conseguimos criar o nosso primeiro registro. E com isso, vimos na 
+prática o uso do repositório e também dos nossos campos da entidade sendo 
+preenchidos e persistidos no banco - uma vez que eles representam o nosso 
+modelo relacional.
+
+Dado esse cenário, entendemos que:
+
+Com o TypeORM a inserção é totalmente abstraída, o que significa que eu 
+não preciso escrever a instrução SQL.
+
+Isso mesmo! Nesse caso de inserção (cenário comum), não é necessário a 
+escrita da query SQL. 
+
+---------------------------------------------------------------------------------
+
+A implementar o padrão Repository para que nossa aplicação consiga persistir e 
+buscar informações das nossas tabelas no nosso banco;
+A implementar na prática o Repository Pattern, padrão que já tínhamos o 
+conhecimento teórico.

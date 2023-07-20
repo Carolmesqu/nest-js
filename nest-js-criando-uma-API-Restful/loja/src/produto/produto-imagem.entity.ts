@@ -2,6 +2,9 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 
 @Entity({ name: 'produto_imagem' })
 class ImagemProduto {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
     @Column({ name: 'url', length: 128, nullable: false })
     url: string;
 
