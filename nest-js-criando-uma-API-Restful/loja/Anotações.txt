@@ -900,3 +900,29 @@ A implementar o padrão Repository para que nossa aplicação consiga persistir 
 buscar informações das nossas tabelas no nosso banco;
 A implementar na prática o Repository Pattern, padrão que já tínhamos o 
 conhecimento teórico.
+
+---------------------------------------------------------------------------------
+
+Nesta aula, aprendemos mais sobre relacionamentos e como aplicá-los utilizando 
+o TypeORM. Entendemos que existem diversos tipos de relacionamentos e a sua 
+aplicabilidade depende muito do cenário negocial. No nosso caso tivemos a 
+ampla utilização do tipo 1:N, visto que produtos podem ter N características 
+e/ou imagens.
+
+A partir dos seus conhecimentos sobre TypeORM e relacionamentos, indique a 
+afirmação correta:
+
+O papel do Cascade é ter um controle na hierarquia dos relacionamentos - 
+caso algum registro sofra alteração e/ou seja deletado, será aplicado 
+em toda a cadeia.
+
+Exatamente isso! Com o Cascade habilitado, toda a cadeia hierárquica 
+terá alterações caso o registro principal sofra uma modificação.
+
+---------------------------------------------------------------------------------
+
+A integrar as nossas entidades para funcionar de acordo com o modelo negocial 
+definido;
+A aplicar o conceito de relacionamentos nas nossas entidades, identificando 
+os tipos de relacionamentos, que são: 1 para 1, 1 para N(muitos) e N para 
+N - muitos para muitos.

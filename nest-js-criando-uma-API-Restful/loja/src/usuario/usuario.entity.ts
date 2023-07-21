@@ -1,4 +1,5 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { ProdutoEntity } from 'src/produto/produto.entity';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 // Primeira passo anotar nossa classe com a propriedade Entity, o name é o que está no banco de dados a tabela 
 @Entity({ name: 'usuarios' })
@@ -17,6 +18,9 @@ export class UsuarioEntity {
 
     @Column({ name: 'senha', length: 256, nullable: false })
     senha: string;
+
+    @OneToMany(() => ProdutoEntity, (produto) => produto.usuarioId, { orphanedRowAction: 'delete', onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    produto: ProdutoEntity[];
 
     // Pra gerar um log sempre que houve um movimento relacionado a opção abaixo
     @CreateDateColumn({ name: 'created_at' })
