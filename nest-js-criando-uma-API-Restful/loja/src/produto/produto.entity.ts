@@ -5,6 +5,7 @@ import { UsuarioEntity } from 'src/usuario/usuario.entity';
 
 @Entity({ name: 'produtos' })
 export class ProdutoEntity {
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -43,6 +44,5 @@ export class ProdutoEntity {
   updatedAt: string;
   
   @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: string;
-  
+  deletedAt: string;  
 }

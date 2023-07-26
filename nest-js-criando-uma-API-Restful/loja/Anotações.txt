@@ -1067,4 +1067,166 @@ Utilizar os comandos para gerar, executar, reverter e mostrar migrações:
 
 ---------------------------------------------------------------------------------
 
+Antes de começarmos é preciso que o ambiente já esteja configurado. Vamos relembrar alguns passos importantes?
 
+    Realize a configuração do ambiente de acordo com o Preparando Ambiente da aula 1;
+    Verifique se as migrações já foram rodadas e criaram as versões no banco de dados. Você pode visualizar as tabelas acessando o localhost do seu PostgresAdmin;
+    Caso as tabelas não tenham sido criadas, rode as migrações com comando npm run typeorm migration:run.
+
+Depois disso, precisamos realizar a instalação de uma ferramenta importante, a CLI do Nest.js.
+
+A CLI do Nest.js é uma interface de linha de comando que ajuda a inicializar, desenvolver e manter suas aplicações Nest.js. Essa ferramenta é útil de diferentes formas, inclusive possui uma técnica para a criação de camadas de visão e controle do CRUD automaticamente a partir do padrão arquitetural MVC , facilitando assim a manutenção do sistema. Esse recurso se chama scaffolding. Dessa forma, a CLI facilita o desenvolvimento de softwares a partir das boas práticas.
+
+Utilizamos o comando a seguir para instalar a CLI do Nest.js globalmente:
+
+---------------------------------------------------------------------------------
+
+https://whimsical.com/der-ecommerce-compree-primeiro-474CA2Gwv6Me5URhCeEPc5
+
+https://whimsical.com/der-ecommerce-compree-JgTNdk8pXrEXh8xSZSwgay
+
+No vídeo anterior, você conferiu os Diagramas de Entidade e Relacionamento 
+(DER) referentes ao projeto. Você pode acessá-los nos seguintes links:
+
+    DER Compree Inicial;
+    DER Compree com pedidos.
+
+Um diagrama de entidade relacionamento reproduz, de forma gráfica ou visual, 
+como as entidades ou tabelas de uma aplicação estarão vinculadas a um banco 
+de dados. Criar essa representação visual facilita a compreensão de como 
+estabelecer os relacionamentos 1:1 (um para um),1:N (um para muitos) e N:M 
+(muitos para muitos). Para praticar você pode, inclusive, desenhar em um papel 
+as tabelas e seus conectores.
+
+Para simplificarmos ainda mais os relacionamentos, podemos descrevê-los em 
+tópicos, como no exemplo a seguir:
+
+Relação entre Usuário e Pedido
+
+    Um Usuário pode ter vários Pedidos
+    Cada Pedido pertence a apenas um Usuário (ou seja, um mesmo pedido não pode 
+    pertencer a vários usuários)
+    Assim, temos um Usuário para muitos Pedidos (1:N)
+
+Relacionamento entre Pedido e Produto
+
+    Um Pedido pode ter vários Produtos
+    Um Produto pode pertencer a vários Pedidos
+    Assim, temos muitos Pedidos para muitos Produtos
+
+O assunto sobre relacionamentos e banco de dados é extenso e requer atenção, 
+sugerimos que você leia o Artigo MER e DER: Definições, Banco de Dados e 
+Exemplos, e também estude a Formação de Modelagem de dados.
+
+---------------------------------------------------------------------------------
+
+Uma das principais vantagens do Nest.js é a sua CLI, que oferece uma ampla 
+gama de comandos para ajudar na criação e gerenciamento de sua aplicação. 
+Um recurso especialmente útil é o CRUD generator, que traduzindo significa 
+gerador de CRUD. Com o gerador CRUD, você pode criar rapidamente todas essas 
+perações para um recurso específico do seu domínio, como usuários, produtos, 
+pedidos, etc.
+
+Para usar o gerador CRUD, você precisa ter o Nest.js e sua CLI instalados e 
+configurados em seu ambiente de desenvolvimento. Em seguida, abra o terminal 
+ou prompt de comando e navegue até o diretório do seu projeto. Agora você 
+está pronto para executar o comando da CLI para criar o CRUD.
+
+O comando para gerar o CRUD é o seguinte:
+
+nest generate resource <nome-do-recurso>
+
+Substitua <nome-do-recurso> pelo nome do recurso que você deseja criar. 
+Por exemplo, se você quiser criar um CRUD para usuários, o comando seria:
+
+nest generate resource users
+
+Ao executar esse comando, a CLI do Nest.js criará automaticamente os 
+arquivos necessários para o recurso de usuários. Isso inclui um controlador 
+(controller), um serviço (service) e uma entidade (entity), se você estiver 
+usando um banco de dados.
+
+O controller é responsável por lidar com as requisições HTTP relacionadas 
+ao recurso. Ele contém os métodos para criar, ler, atualizar e deletar os 
+objetos do recurso. O Service é responsável pela lógica de negócio 
+relacionada ao recurso, enquanto a Entity representa a estrutura de dados 
+do recurso, se estiver usando um banco de dados.
+
+Caso a CLI do Nest.js não atualize automaticamente o arquivo app.module.ts 
+para importar o controlador e o serviço do recurso que você criou, é 
+necessário importá-lo manualmente. Isso garante que o Nest.js reconheça e 
+gerencie corretamente o novo recurso em sua aplicação.
+
+Depois de executar o comando, você pode personalizar o código gerado de 
+acordo com as necessidades do seu aplicativo. Por exemplo, você pode 
+adicionar validações, personalizar as rotas ou adicionar relacionamentos 
+com outras entidades.
+
+Em resumo, a CLI do Nest.js é uma ferramenta poderosa que simplifica o 
+processo de desenvolvimento de aplicativos com Nest.js. O recurso do 
+gerador CRUD permite criar rapidamente operações básicas para recursos 
+de domínio, economizando tempo e esforço. Utilize a CLI para acelerar o 
+desenvolvimento e focar em aspectos mais complexos e personalizados de 
+seus projetos.
+
+---------------------------------------------------------------------------------
+
+
+
+A padronização e convenção de nomenclatura de variáveis, funções, arquivos, 
+dentre outros é uma boa prática que permite a consistência do código em projetos 
+que apresentam diferentes níveis de complexidade.
+
+Entretanto, a padronização em TypeScript, Nest.js ou no Banco de Dados não é a 
+mesma e essas convenções diferentes aparecem com frequência em nosso projeto. 
+É por esse motivo que algumas nomenclaturas no código parecem “variar” de 
+padronização. Porém, o que ocorre é a utilização do padrão referente a cada 
+ferramenta.
+
+Vamos entender um pouco mais sobre isso?
+
+Padrões de nomenclatura com TypeORM, PostgreSQL e Nest.js juntos
+
+Há algumas convenções de nomenclatura específicas que são recomendadas para 
+manter uma estrutura consistente e facilitar o desenvolvimento, como:
+
+    Nomes de entidades no JavaScript: em geral, recomenda-se utilizar o padrão 
+    PascalCase para nomear as entidades. Por exemplo, uma entidade para 
+    representar um usuário pode ser chamada de User.
+    Nomes das tabelas no banco de dados: alguns padrões podem ser utilizados, 
+    mas nesse projeto optamos pelo plural e snake_case para representar o 
+    conjunto de dados. Por exemplo, tabelas chamadas como usuarios, pedidos, 
+    produtos, itens_pedidos etc.
+    Nomes de colunas no JavaScript: utilize camelCase para nomear as colunas da 
+    tabela do banco de dados. Por exemplo, uma coluna para armazenar o nome 
+    completo de um usuário pode ser chamada de fullName.
+    Nomes de colunas no banco de dados: já para as colunas, a convenção é
+     utilizar o singular e snake_case. Por exemplo: nome, descricao, valor, 
+     quantidade_disponivel etc.
+    Chaves primárias (primary key): recomenda-se utilizar o nome id para a 
+    chave primária das entidades. O TypeORM identifica automaticamente a 
+    coluna id como chave primária, mas também permite definir outros nomes 
+    se necessário.
+    Chaves estrangeiras (foreign key): para as chaves estrangeiras, é comum 
+    adicionar o nome da entidade relacionada, seguido de Id. Por exemplo, se 
+    uma entidade Pedido possui uma relação com a entidade Usuario, a coluna 
+    de chave estrangeira pode ser chamada de usuarioId.
+    Relações (relation): para estabelecer relações entre entidades no TypeORM, 
+    é possível usar decorators como @ManyToOne, @OneToMany, entre outros. Ao 
+    utilizar esses decorators, é recomendado utilizar o nome da entidade no 
+    singular para definir a relação. Por exemplo, se uma entidade Usuario 
+    possui vários pedidos, a relação pode ser definida como @OneToMany(() => 
+    Pedidos, pedido => pedido.usuario).
+
+Essas são apenas algumas das convenções mais comuns ao usar o TypeORM com o 
+PostgreSQL e o Nest.js. No entanto, é importante ressaltar que essas 
+convenções podem ser adaptadas de acordo com as necessidades específicas 
+do projeto e das diretrizes da equipe, ou seja, as convenções podem variar 
+dependendo do padrão adotado pela equipe ou organização, e é essencial manter
+ a consistência dentro do projeto para facilitar a leitura e manutenção do código.
+
+---------------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------------------
