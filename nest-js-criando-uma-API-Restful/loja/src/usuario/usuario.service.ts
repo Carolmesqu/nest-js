@@ -4,6 +4,7 @@ import { ListaUsuarioDTO } from "./dto/ListaUsuario.dto";
 import { UsuarioEntity } from "./usuario.entity";
 import { Repository } from "typeorm";
 import { AtualizaUsuarioDTO } from "./dto/AtualizaUsuario.dto";
+import { CriaUsuarioDTO } from "./dto/CriaUsuario.dto";
 
 @Injectable()
 export class UsuarioService {
@@ -13,9 +14,16 @@ export class UsuarioService {
         private readonly usuarioRepository: Repository<UsuarioEntity> // Agora estamos dando acesso apenas de leitura para ela
     ) {}
 
-    async criaUsuario(usuarioEntity: UsuarioEntity) {
-        await this.usuarioRepository.save(usuarioEntity); // Utilizamos o save, pois ele via salvar no banco de dados
-    }
+    async criaUsuario(dadosDoUsuario: CriaUsuarioDTO) {
+        const usuarioEntity = new UsuarioEntity();
+    
+        usuarioEntity.email = dadosDoUsuario.email;
+        usuarioEntity.senha = dadosDoUsuario.senha;
+        usuarioEntity.nome = dadosDoUsuario.nome;
+    
+        return this.usuarioRepository.save(usuarioEntity);
+      }
+    
 
     // Função para recuperar os usuarios do banco
     async listaUsuarios() {

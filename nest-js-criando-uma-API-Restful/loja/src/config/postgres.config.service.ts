@@ -12,7 +12,7 @@ export class PostgresConfigService implements TypeOrmOptionsFactory {
 
     // Criando função para o typeOrm ter algumas opções e se conectar com banco de dados
     createTypeOrmOptions(): TypeOrmModuleOptions {
-        // Nosso retornor será configurações do banco
+        // Nosso retornor será configurações do banco, do nosso objeto SÃO INFOS IMPORTANTES PARA O TYPEORM TRABALHAR
         return {
             type: 'postgres',
             host: this.configService.get<string>('DB_HOST'),            
@@ -23,7 +23,7 @@ export class PostgresConfigService implements TypeOrmOptionsFactory {
             // Da forma que escrevemos abaixo, estamos dizendo para ele voltar para o diretorio default e a partir dele acessa uma página
             // e depois disso acesse os arquivos que tenha .entity
             entities: [__dirname + '/../**/*.entity{.js,.ts}'],
-            synchronize: true
+            //synchronize: true //Faz o trabalho de criar as tabelas, só é útil em ambiente de desenvolvimento
         }
     }
 }

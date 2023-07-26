@@ -35,20 +35,14 @@ export class UsuarioController {
 
   @Post()
   async criaUsuario(@Body() dadosDoUsuario: CriaUsuarioDTO) {
-    const usuarioEntity = new UsuarioEntity();
-    usuarioEntity.email = dadosDoUsuario.email;
-    usuarioEntity.senha = dadosDoUsuario.senha;
-    usuarioEntity.nome = dadosDoUsuario.nome;
-    //uuid é uma biblioteca de auto incremento de id
-    usuarioEntity.id = uuid();
-    
-  // this.usuarioRepository.salvar(usuarioEntity); Antes estava assim
-    this.usuarioService.criaUsuario(usuarioEntity); 
+    const usuarioCriado = await this.usuarioService.criaUsuario(dadosDoUsuario);
 
-    return { 
-      usuario: new ListaUsuarioDTO(usuarioEntity.id, usuarioEntity.nome),
-      message: 'usuário criado com sucesso' };
+    return {
+      usuario: new ListaUsuarioDTO(usuarioCriado.id, usuarioCriado.nome),
+      messagem: 'usuário criado com sucesso',
+    };
   }
+
 
   //Metodo para listar usuarios
   @Get()
