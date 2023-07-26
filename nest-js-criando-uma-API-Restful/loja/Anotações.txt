@@ -926,3 +926,145 @@ definido;
 A aplicar o conceito de relacionamentos nas nossas entidades, identificando 
 os tipos de relacionamentos, que são: 1 para 1, 1 para N(muitos) e N para 
 N - muitos para muitos.
+
+---------------------------------------------------------------------------------
+
+Agora que você aprendeu sobre migrações, vamos aproveitar para realizar uma 
+modificação no código e praticar esse conhecimento?
+
+Abra o arquivo src/produto/produto.entity.ts. Nele, você encontrará a seguinte 
+propriedade na entidade:
+
+  @Column({ name: 'usuario_id', length: 100, nullable: false })
+  usuarioId: string;
+
+Contudo, essa propriedade não faz mais sentido para o contexto que vamos 
+modelar nosso e-commerce. Ela estaria indicando, na teoria, que um produto 
+referencia o ID de um usuário. Em outras palavras, um produto poderia estar 
+associado a apenas um usuário. Além disso, aqui não estamos utilizando os 
+decorators de relacionamentos do TypeORM (como o @ManyToOne e @OneToMany, 
+então essa relação também não está corretamente estabelecida nas nossas 
+entidades.
+
+    Dando um spoiler: o que iremos modelar a partir da próxima aula é que 
+    um usuário pode possuir vários pedidos. Os pedidos, por sua vez, podem 
+    possuir vários produtos, ao mesmo tempo que um produto pode fazer parte 
+    de vários pedidos. Assim, não haverá relação direta entre um usuário e 
+    um produto. Você verá isso em mais detalhes com a Camis!
+
+Dessa forma, remova essas duas linhas de código de ProdutoEntity. Como isso 
+resultará em uma modificação no Banco de Dados, é importante que você gere 
+e rode uma nova migração que reflita essa mudança.
+
+---------------------------------------------------------------------------------
+
+Existem alguns casos onde as queries SQL geradas pelas migrações podem causar 
+erros ao serem executadas. Um exemplo é quando tentamos adicionar, em uma tabela, 
+uma nova coluna que não permite valores nulos. Por exemplo, digamos que você 
+queira adicionar uma coluna endereco em UsuarioEntity:
+
+  @Column({ name: 'endereco', length: 255, nullable: false })
+  endereco: string;
+
+    Dica: na verdade, o parâmetro nullable é false por padrão no TypeORM, 
+    então mesmo que você não passe essa propriedade, a coluna será criada 
+    para não permitir valores nulos.
+
+Suponha que você já tenha registros na tabela de usuários. Se você gerar uma 
+migração para a alteração acima e tentar rodá-la, você verá um erro como o 
+seguinte:
+
+QueryFailedError: column "endereco" of relation "usuarios" contains null 
+values
+
+Traduzindo: A coluna "endereco" da relação "usuarios" contém valores nulos
+
+E faz sentido que esse erro aconteça, pois se já houver ao menos um registro 
+nessa tabela, eles não conseguirão definir automaticamente um valor para essa 
+coluna ao tentar adicioná-la, já que ela não permite valores nulos.
+
+    E caso não haja registros na tabela, a migração será executada sem erros. 
+    Porém, ao tentar cadastrar um novo usuário, o TypeORM lançará um erro em 
+    tempo de execução da API. Nesse caso, é importante reverter a migração com 
+    migration:revert para retornar o Banco de Dados ao estado que estava 
+    funcionando!
+
+Dessa forma, temos duas opções. A primeira delas é permitir valores nulos 
+nesta coluna, então basta definir o valor da propriedade nullable como true:
+
+  @Column({ name: 'endereco', length: 255, nullable: true })
+  endereco: string;
+
+Neste caso, é importante ter em mente que nem todos os usuários terão um 
+endereço em um primeiro momento. E isso faz sentido, já que até este momento 
+essa informação não era exigida a todos os usuários.
+
+A outra opção é manter a coluna como não nula e definir um valor padrão para 
+ela com a propriedade default:
+
+@Column({ name: 'endereco', length: 255, nullable: false, default: 'sem_endereco' })
+endereco: string;
+
+Para esse caso em específico, não é semântico utilizar uma string 'sem_endereco', 
+então a primeira opção faz mais sentido. Contudo, há casos onde definir um valor 
+padrão faz mais sentido do que permitir valores nulos, como o status de um pedido.
+
+Ao escolher uma dessas soluções, você poderá gerar uma nova migração de acordo e 
+executá-la. Caso você tenha um arquivo de migração no projeto que não foi 
+executado e que você não precisa mais (como um que gera um erro), basta excluí-lo 
+do projeto ou modificar suas queries SQL para realizar as operações adequadas 
+para o seu caso.
+
+Agora você entendeu melhor a causa de certos erros que podem acontecer ao rodar 
+ou mesmo reverter migrações, dependendo das queries que foram geradas 
+automaticamente pelo TypeORM. 
+
+---------------------------------------------------------------------------------
+
+Lisa é desenvolvedora e está trabalhando em um projeto que possui um Data Source 
+configurado para a CLI do TypeORM, indicando corretamente os caminhos das 
+entidades e o caminho das migrações no projeto.
+
+O projeto já tem uma migração que constrói a estrutura inicial do Banco de 
+Dados, criando uma tabela chamada filmes com as colunas nome e ano_lancamento. 
+Lisa precisava adicionar uma coluna genero na tabela filmes no banco de dados, 
+para isso ela incluiu a propriedade genero no código da entidade. O problema é 
+que essa mudança ainda precisa ser refletida no banco de dados.
+
+Quais comandos da CLI do TypeORM Lisa deve executar para que isso aconteça?
+
+    migration:generate caminho-da-migracao/adiciona-coluna-genero-em-filmes
+    migration:run.
+
+Depois de modificar o código da entidade, o comando migration:generate identifica 
+essa mudança e gera uma migração correspondente. Em seguida, o migration:run executa 
+as migrações geradas que ainda não foram executadas, ou seja, ele irá executar a 
+migração adiciona-coluna-genero-em-filmes e vai adicionar a coluna no banco de dados.
+
+---------------------------------------------------------------------------------
+
+Embarcar em um projeto em andamento que usa um BD:
+    Você revisou as etapas necessárias que novos membros de um time devem 
+    realizar obrigatoriamente: instalar as dependências, criar as variáveis 
+    de ambiente, configurar o Docker e criar um servidor com um BD no 
+    Postgres Admin.
+
+Instalar a CLI do TypeORM e configurar um Data Source para ela:
+    A CLI é necessária para trabalharmos com migrações no TypeORM.
+
+Versionar o BD com migrações:
+    Assim como o Git realiza o versionamento de código, as migrações realizam 
+    o versionamento de Banco de Dados. Nós geramos e executamos uma migração 
+    para cada nova alteração no BD que é realizada. As migrações contêm queries 
+    SQL que aplicam uma alteração com o método up ou desfazem essa alteração 
+    com o método down. Assim, é possível alternar facilmente entre diferentes 
+    versões do Banco de Dados e sempre alinhar o time com a versão mais recente.
+
+Utilizar os comandos para gerar, executar, reverter e mostrar migrações:
+    Os comandos são migration:generate, migration:run, migration:revert e 
+    migration:show. Para facilitar o uso, criamos o script "typeorm": 
+    "typeorm-ts-node-esm --dataSource src/db/data-source-cli.ts".
+
+---------------------------------------------------------------------------------
+
+

@@ -8,10 +8,10 @@ export class ProdutoEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => UsuarioEntity, (usuarioEntity) =>
-  usuarioEntity.produto, { cascade: true, eager: true })
-  @Column({ name: 'usuario_id', length: 128, nullable: false })
-  usuarioId: UsuarioEntity;
+  // @ManyToOne(() => UsuarioEntity, (usuarioEntity) =>
+  // usuarioEntity.produto, { cascade: true, eager: true })
+  // @Column({ name: 'usuario_id', length: 128, nullable: false })
+  // usuarioId: UsuarioEntity;
 
   @Column({ name: 'nome', length: 128, nullable: false })
   nome: string;
