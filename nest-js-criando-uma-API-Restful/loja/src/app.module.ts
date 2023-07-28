@@ -1,10 +1,10 @@
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ProdutoModule } from './produto/produto.module';
 import { UsuarioModule } from './usuario/usuario.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostgresConfigService } from './config/postgres.config.service';
-import { ConfigModule } from '@nestjs/config';
 import { PedidoModule } from './pedido/pedido.module';
 
 @Module({
@@ -12,11 +12,11 @@ import { PedidoModule } from './pedido/pedido.module';
     UsuarioModule,
     ProdutoModule,
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
-      useClass:PostgresConfigService,
-      inject: [PostgresConfigService]
+      useClass: PostgresConfigService,
+      inject: [PostgresConfigService],
     }),
     PedidoModule,
   ],

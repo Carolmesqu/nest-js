@@ -2,6 +2,7 @@ import { ProdutoEntity } from '../produto/produto.entity';
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
 import { StatusPedido } from './enum/statuspedido.enum';
 import { UsuarioEntity } from '../usuario/usuario.entity';
+import { ItemPedidoEntity } from './itempedido.entity';
 
 
 @Entity({ name: 'pedidos' })
@@ -27,4 +28,9 @@ export class PedidoEntity {
 
     @ManyToOne(() => UsuarioEntity, (usuario) => usuario.pedidos)
     usuario: UsuarioEntity;
+
+    @OneToMany(() => ItemPedidoEntity, (itemPedido) => itemPedido.pedido, {
+        cascade: true
+    })
+    itensPedido: ItemPedidoEntity[];
 }

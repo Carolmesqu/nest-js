@@ -1227,6 +1227,166 @@ dependendo do padrão adotado pela equipe ou organização, e é essencial mante
 
 ---------------------------------------------------------------------------------
 
+Você recebeu uma tarefa para criar um novo domínio em uma aplicação de uma 
+rede de petshops. Esse desafio consiste em construir entidade, controller, 
+DTO e testes para os animais de estimação, que você chamará de pets, com o 
+framework Nest.js.
+
+Além disso, sua liderança sugeriu que você utilizasse o recurso de CRUD 
+Generator do Nest para otimizar o desenvolvimento.
+
+A respeito desse recurso, marque as alternativas corretas:
+
+Ao criar um novo recurso com o CRUD Generator, o Nest automaticamente 
+importa o módulo desse recurso no app.module.ts.
+
+O CRUD Generator é uma ferramenta prática para geração automática de CRUD 
+e acelera o desenvolvimento de aplicações. Além disso, os recursos com os 
+comandos nest g resource nomedodomínio realizam scaffolding do domínio a 
+partir do padrão de arquitetura selecionado.
+Alternativa correta
+
+O comando nest g resource pet irá realizar o scaffolding de um novo recurso 
+chamado pet, criando seu controlador, serviço, módulo, entidade, DTOs e 
+testes.
+
+O scaffolding no Nest.js é uma prática que agiliza o desenvolvimento de 
+aplicativos e garante uma estrutura coesa desde o início. Com os comandos 
+na CLI você gera automaticamente módulos, controladores, provedores e outros 
+artefatos da aplicação. Ao utilizar o scaffolding, você pode se concentrar 
+mais na lógica de negócios e menos na configuração básica do projeto. 
+O Nest.js também oferece a flexibilidade de personalizar os modelos gerados, 
+permitindo adaptar a estrutura às necessidades específicas do projeto.
+
+---------------------------------------------------------------------------------
+
+Analisar o DER da API:
+    Entendemos como os relacionamentos da nossa API seriam implementados 
+    a partir de um Diagrama de Entidade e Relacionamento (DER).
+Usar o Scaffolding com Nest.js:
+    Utilizamos a CLI do Nest.js para criar domínio de pedidos com o CRUD 
+    generator.
+Criar relacionamentos 1:N com Nest.js e TypeORM:
+    Criamos um relacionamento 1:N entre entidade Usuários e Pedidos no 
+    Banco de dados com TypeORM.
+
+---------------------------------------------------------------------------------
+
+Uma dúvida pertinente que pode surgir é sobre a criação de uma tabela auxiliar. 
+Afinal, não seria mais fácil estabelecer um relacionamento Muitos para Muitos 
+diretamente do que precisar de uma tabela auxiliar?
+
+Para respondermos essa questão precisamos entender o papel de uma tabela 
+auxiliar. Vamos lá?
+
+A tabela auxiliar desempenha algumas funções importantes. No caso do 
+relacionamento N:M é atuar como uma entidade intermediária que faz a ponte 
+entre as duas tabelas principais envolvidas no relacionamento, contendo 
+informações sobre as associações entre os registros das tabelas principais.
+
+Vamos conferir algumas funções das tabelas auxiliares:
+
+    Representar o relacionamento entre tabelas N:M: por armazenar os registros 
+    que definem as associações entre os elementos de tabelas principais, a 
+    tabela auxiliar permite o estabelecimento da ligação entre muitos para 
+    muitos.
+    Permitir atributos adicionais: a tabela auxiliar é flexível no processo 
+    de adição de atributos extras dentro de um relacionamento N:M. Em nossa 
+    entidade itemPedido, podemos inserir o campo de precoVenda e quantidade, 
+    por exemplo.
+    Facilitar operações de join: através da tabela auxiliar é possível 
+    facilitar a obtenção de dados relacionados, aprimorando a performance 
+    das consultas que envolvem o relacionamento N:M.
+    Deixar o banco de dados modular e escalável: ao abstrairmos o relacionamento
+    N:M com a presença de uma tabela auxiliar, o banco de dados se torna mais 
+    modular e escalável. Essa divisão possibilita a adição e remoção de 
+    associações sem comprometimento direto das tabelas principais, ou seja, 
+    seu sistema não fica engessado para implementações ou mudanças posteriores.
+
+As conexões entre chaves estrangeiras das tabelas relacionadas à tabela 
+auxiliar objetivam manter a integridade referencial do relacionamento N:M, 
+evitando inconsistências na integridade dos dados.
+
+Durante a modelagem do banco de dados, avalie a possibilidade de estabelecer 
+uma tabela auxiliar e identifique a relevância de sua criação para o seu produto.
+
+---------------------------------------------------------------------------------
+
+O item do pedido, ou seja, o seu id, ainda não está relacionado ao pedido na 
+tabela e também não é devolvido na resposta da requisição. O JSON traz somente 
+os valores da propriedade quantidade. Como podemos relacioná-los?
+
+O primeiro passo é implementar o DTO para manipulação dos dados.
+
+Vamos renomear o arquivo create-pedido.dto.ts para CriaPedido.dto.ts, mas:
+
+    Lembre de atualizar as importações do arquivo;
+    Em seguida, implemente a classe de ItemPedidoDTO e CriaPedidoDTO.
+
+1 - Acesse o diretório pedidos\dto, crie um arquivo CriaPedidoDto.ts e delete 
+o arquivo create-pedido.dto.ts.
+
+2 - Realize as importações da classe Type do 'class-transformer', que é a 
+biblioteca usada para transformar objetos JavaScript em instâncias de classes 
+personalizadas.
+
+3 - Faça as importações de ArrayMinSize, IsArray, IsInt, ValidateNested do 
+módulo class-validator'.
+
+4 - Instancie uma classe chamada ItemPedidoDTO e informe que haverá um @IsInt 
+(que irá validar se uma propriedade é realmente um inteiro), com a propriedade 
+quantidade do tipo number.
+
+5 - Em seguida você deverá criar uma classe chamada CriaPedidoDTO que 
+comporta os decorators a seguir:
+
+    @ValidateNested(): valida objetos aninhados.
+    @ArrayMinSize: valida se um array tem o tamanho mínimo especificado.
+    @IsArray: valida se uma propriedade é um array.
+    @Type: valida o tipo de objeto declarado.
+
+import { Type } from 'class-transformer';
+import { ArrayMinSize, IsArray, IsInt, ValidateNested } from 'class-validator';
+
+class ItemPedidoDTO {
+  @IsInt()
+  quantidade: number;
+}
+
+export class CriaPedidoDTO {
+  @ValidateNested()
+  @IsArray()
+  @ArrayMinSize(1)
+  @Type(() => ItemPedidoDTO)
+  itensPedido: ItemPedidoDTO[];
+}
+
+O código acima define duas classes TypeScript: ItemPedidoDTO e CriaPedidoDTO, 
+que são usadas para validar os dados de um pedido.
+
+A classe ItemPedidoDTO define a estrutura de um item de pedido. Ela possui 
+uma propriedade chamada quantidade, que deve ser um número inteiro de acordo 
+com a validação @IsInt().
+
+A classe CriaPedidoDTO define a estrutura de um pedido completo. Ela possui a 
+propriedade itensPedido, que deve ser um array de objetos ItemPedidoDTO de 
+acordo com as validações @ValidateNested(), @IsArray() e @ArrayMinSize(1). A 
+validação @ValidateNested() é usada para validar os objetos aninhados na 
+propriedade itensPedido.
+
+A anotação @Type(() => ItemPedidoDTO) é usada em conjunto com a validação 
+@ValidateNested() para especificar o tipo dos objetos aninhados na propriedade 
+itensPedido como instâncias da classe ItemPedidoDTO.
+
+Essas classes e validações podem ser usadas para garantir que os dados de um 
+pedido estejam corretos e sigam as regras estabelecidas pelas validações.
+
+Nosso projeto agora está preparado para trabalharmos com o cadastro completo 
+de itens de um pedido. 
+
+---------------------------------------------------------------------------------
+
 
 
 ---------------------------------------------------------------------------------
+
