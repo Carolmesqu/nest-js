@@ -1388,5 +1388,182 @@ de itens de um pedido.
 
 
 
+Imagine que você construiu um banco de dados para gestão de consultas médicas. 
+Você tem então uma entidade de consultas e outra tabela auxiliar com horários 
+vagos. Quando um paciente agenda, atualiza ou precisa deletar uma consulta, 
+data e horário disponíveis do médico também precisam sofrer atualização. 
+Pensando nesse caso, é possível manipular esses dados com processos em cascata 
+no seu banco de dados. Vamos entender melhor o que são esses processos?
+
+Em primeiro lugar, cascata, em banco de dados é diferente do conceito de 
+Modelo cascata ou waterfall de desenvolvimento. O processo em cascata é uma 
+operação de deleção, criação ou atualização aplicada automaticamente aos 
+registros relacionados através quando determinada operação é executada.
+
+Os relacionamentos entre entidades são trabalhados com as Chaves 
+estrangeiras e Primárias, tudo para manter sua integridade relacional. 
+Por sua vez, os processos em cascate impedem a presença de dados “orfãos”, 
+ou seja, dados que não estão associados a um pai ou filho em nosso banco 
+de dados.
+
+Além disso, também ao habilitar essa funcionalidade, não despendemos mais 
+tempo escrevendo códigos adicionais para excluir os registros filhos de 
+forma independente, poupando tempo e deixando nosso código menos verboso.
+
+E como implementamos processos em cascata com TypeOrm e Nest.js?
+
+Podemos notar que utilizamos o termo cascade para a atualização ou 
+deleção de linhas ou até tabelas inteiras em cascata. No entanto, durante 
+a implementação do código, nos deparamos com dois casos de uso, que 
+você confere a seguir:
+
+    O termo cascade: true, em letras minúsculas e aparecendo como uma 
+    chave-valor dentro do relacionamento com TypeOrm;
+    O termo CASCADE, em letras maiúsculas e surgindo como o valor de 
+    uma propriedade, confira no exemplo a seguir:
+
+onDelete: 'CASCADE', onUpdate: 'CASCADE',	
+
+Mas será que ambos significam a mesma coisa?
+
+O cascade:true é a forma que TypeORM faz referência ao processo de 
+cascata, ou seja, é a opção específica que é configurada no relacionamento 
+para habilitar o comportamento em cascata e automatizar as operações em 
+registros filhos.
+
+Por outro lado, CASCADE é um termo oriundo diretamente dos bancos relacionais 
+e se refere às operações nos registros relacionados.
+
+Os processos em cascata são úteis em diferentes contextos de nossas aplicações. 
+Porém, é importante trabalharmos com cautela para que não ocorra a exclusão 
+de dados importantes que estão relacionados, seu uso deve ser executado quando 
+você possuir a certeza do comportamento esperado. Para isso, a modelagem do 
+banco de dados surge como um recurso essencial para realização eficiente do 
+cascade em seu projeto.
+
+Leia também:
+
+    Documentação do TypeORM;
+    https://typeorm.io/relations#cascades
+    Documentação do Postgres.
+    https://www.postgresql.org/docs/current/ddl-constraints.html#:~:text=In%20this%20case%2C%20CASCADE%20means,its%20referencing%20columns%20are%20null.
+
 ---------------------------------------------------------------------------------
 
+Antes de concretizarmos a operação de atualização de um pedido, precisamos 
+implementar a propriedade que qualifica o status do pedido. Para tal, vamos 
+seguir alguns passos:
+
+    Para manipular a informação via DTO através da criação de uma classe 
+    chamada AtualizaPedidoDto com o decorator @IsEnum recebendo a classe 
+    StatusPedido como parâmetro.
+    Preparar a rota no controller para a busca através de um id, e trabalhar 
+    a atualização com um decorator @Patch.
+    Implementar o serviço de atualização com um método chamado atualizaPedido, 
+    que irá buscar o pedido via id, realizar a alteração e retornar o 
+    pedidoRepository alterado.
+
+---------------------------------------------------------------------------------
+
+
+
+Em arquitetura de software há diversas formas de criar aplicações. Algumas se 
+baseiam na separação de responsabilidades do seu código em camadas, que tornam 
+o seu código mais organizado e pode seguir vários padrões de estruturação em 
+camadas. No nosso projeto, estamos utilizando quatro camadas fundamentais: os 
+controllers, os serviços, os repositórios e a camada de persistência. Entenda 
+melhor cada uma delas:
+
+    A camada de controller é responsável por receber as requisições HTTP e 
+    direcioná-las aos serviços adequados. Essa camada define os endpoints da 
+    API e os métodos HTTP associados a cada um deles. Com o Nest.js, é possível 
+    definir rotas de forma declarativa através dos decorators para associar as 
+    rotas a funções específicas dentro do controller. Essas funções são 
+    responsáveis por receber os dados da requisição, chamar os serviços 
+    correspondentes e retornar a resposta adequada para o cliente.
+
+    Já a camada de serviço (service) é responsável por conter a lógica de 
+    negócios de nossa API. Ela é a ponte entre a camada de controle e a camada 
+    de repositórios. Os serviços podem conter regras de negócio específicas e 
+    realizar validações antes de executar métodos dos repositórios.
+
+    A camada de repositórios interage diretamente com o banco de dados. No 
+    nosso projeto, ela não possui arquivos próprios, pois já está sendo abstraída 
+    pelos repositórios do TypeORM. Um repositório é capaz de interagir diretamente 
+    com o banco de dados e realizar operações como consultas, inserções, 
+    atualizações e exclusões.
+
+    A camada de persistência é o banco de dados em si. No nosso código, 
+    ele é representado pelas entidades.
+
+Quando combinamos essas camadas com o Nest.js, TypeORM e PostgreSQL, temos 
+uma estrutura poderosa para o desenvolvimento de aplicativos back-end.
+
+O Nest.js oferece uma arquitetura modular e baseada em injeção de dependências, 
+facilitando a criação e o teste de cada uma dessas camadas separadamente. O 
+TypeORM simplifica a interação com o banco de dados, fornecendo uma API fácil 
+de usar para realizar operações de CRUD. E o PostgreSQL é um banco de dados 
+confiável e escalável, adequado para aplicações de diferentes tamanhos e 
+requisitos.
+
+Em resumo, o uso de camadas de serviço, controller e persistência no Nest.js, 
+em conjunto com TypeORM e o PostgreSQL, proporciona uma estrutura sólida e 
+organizada para o desenvolvimento de aplicações back-end, pois essa abordagem 
+ajuda a separar as responsabilidades, facilitando a manutenção, teste e 
+o aprimoramento do código.
+
+Continue estudando sobre arquitetura de software para você adquirir uma 
+perspectiva de mais alto nível em relação a estruturação de suas aplicações.
+
+Confira a formação de Engenharia de Software para conhecer mais sobre o tema.
+
+---------------------------------------------------------------------------------
+
+Sua equipe está desenvolvendo uma aplicação de comércio eletrônico e você ficou 
+responsável por implementar um relacionamento N:M entre os modelos "Pedido" e 
+"Produto" usando o Nest.js e o TypeORM. O objetivo é permitir que um pedido 
+possa estar associado a vários produtos e, ao mesmo tempo, um produto possa 
+estar presente em vários pedidos.
+
+Nesse contexto, marque as afirmações corretas a respeito desse tipo de 
+relacionamento:
+Selecione 2 alternativas 
+
+Em um relacionamento N:M, a tabela auxiliar carrega duas chaves 
+estrangeiras: uma relacionada a cada tabela principal.
+
+A tabela auxiliar, no contexto de intermediária para um relacionamento 
+N:M, possui as chaves estrangeiras que referenciam as duas tabelas 
+principais.Cada registro da tabela auxiliar relaciona um registro de 
+uma tabela principal ao registro de outra tabela principal.
+
+Tabelas auxiliares, em relacionamentos N:M, ajudam na manutenção da 
+integridade relacional dos dados, contribuem para o processo de 
+escalabilidade e apresentam maior controle na persistência dos dados.
+
+As tabelas auxiliares possuem atributos próprios que se referem aos 
+relacionamentos estipulados. Além de ser evidenciada como uma boa prática, 
+a criação de tabelas auxiliares proporciona maior legibilidade do código e 
+facilidade na manutenção do banco de dados. No entanto, é importante sempre 
+verificar a modelagem do banco de dados e lógica de negócio para implementação 
+dos relacionamentos.
+
+---------------------------------------------------------------------------------
+
+    Implementar relacionamentos N:M:
+        Implementamos relacionamentos do tipo muito para muitos a partir da 
+        construção de uma tabela auxiliar com os decorators do TypeORM.
+    Aplicar processos em cascata no banco de dados:
+        Estabelecemos processos em cascata para atualização de um pedido através 
+        do TypeORM com o recurso cascade: update, permitindo assim a alteração 
+        automática da tabela de produtos a partir da itensPedido.
+
+    Implementar regras de negócio no serviço:
+        Aprendemos como verificar se um determinado id de produtosIds está 
+        incluso na lista de itensPedido para buscar um produto. Em seguida 
+        conseguimos modificar o valor do produto relacionado a partir do 
+        precoVenda, inserimos a quantidade com informações do DTO e adicionamos 
+        a regra de negócio que subtrai um produto da tabela de produtos após a 
+        criação de um pedido.
+
+---------------------------------------------------------------------------------

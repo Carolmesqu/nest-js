@@ -12,7 +12,7 @@ export class ItemPedidoEntity {
     id: string;
 
     @Column({ name: 'quantidade', nullable: false })
-    quantida: number;
+    quantidade: number;
 
     @Column({ name: 'preco_venda', nullable: false })
     precoVenda: number;
@@ -23,4 +23,8 @@ export class ItemPedidoEntity {
     })
     pedido: PedidoEntity;
 
+    @ManyToOne(() => ProdutoEntity, (produto) => produto.itensPedido, {
+        cascade: ['update'] //Neste contexto o update vai realizar uma tarefa de atualização
+    })
+    produto: ProdutoEntity;
 }
