@@ -8,7 +8,7 @@ import {
   IsUrl,
   MaxLength,
   Min,
-  ValidateNested  
+  ValidateNested,
 } from 'class-validator';
 import { ProdutoEntity } from '../produto.entity';
 
