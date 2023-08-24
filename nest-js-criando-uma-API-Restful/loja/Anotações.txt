@@ -1893,3 +1893,23 @@ de validação de uma propriedade, somente um dos arquivos precisa ser alterado.
         utilizamos o recurso de type assertion (asserção de tipo) do TypeScript.
 
 ---------------------------------------------------------------------------------
+
+Revisão
+
+Você conheceu sobre migrações, entendeu qual a vantagem de utilizá-las 
+em um projeto em produção e como isso facilita a entrada de pessoas em um projeto. 
+Além de conhecer vários comandos da CLI do TypeORM.
+
+Preparando as migrações em nosso projeto, você aprendeu a parte 
+de relacionamentos para poder implementar as novas funcionalidades para que 
+pessoas usuárias pudessem fazer pedidos no e-commerce. Para isso, 
+entramos em relacionamentos mais avançados como muitos para muitos.
+
+Depois disso, aproveitamos para refinar a API. Com isso, fizemos um tratamento 
+de erros mais robusto e, inclusive, fizemos um filtro de exceções.
+
+Por fim, refatoramos o projeto utilizando alguns recursos do NestJS que 
+facilitava o uso dos DTOs e até uma técnica do JavaScript em conjunto 
+com o TypeScript, utilizando o Object.assign().
+
+---------------------------------------------------------------------------------
