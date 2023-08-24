@@ -1567,3 +1567,329 @@ dos relacionamentos.
         criação de um pedido.
 
 ---------------------------------------------------------------------------------
+
+Nesta aula, você aprendeu a criar um filtro de exceções do Nest e utilizá-lo de 
+forma global. Em src/app.module.ts, adicionamos o seguinte código no decorator 
+@Module:
+
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: FiltroDeExcecaoGlobal,
+    },
+  ],
+
+Onde o FiltroDeExcecaoGlobal é o filtro que criamos. Mas sabia que há outras 
+formas de aplicar um filtro na aplicação? Vamos ver alguns exemplos?
+
+    Esse assunto também pode ser estudado na seção Binding Filters da 
+    documentação do Nest.
+
+Registramos o nosso filtro de forma global na aplicação, mas é possível 
+registrá-lo a nível de controlador ou mesmo a nível de um método. Para ambos 
+os casos, utilizamos o decorator @UseFilters do módulo @nestjs/common do Nest.
+
+    Nos próximos exemplos, o nome do filtro utilizado será FiltroDeExcecao.
+
+Para usar o nosso filtro diretamente em um método de controlador, por exemplo, 
+o criaPedido do controlador de pedidos, teríamos o seguinte:
+
+  @Post()
+  @UseFilters(FiltroDeExcecao)
+  async criaPedido(/* parâmetros... */) {
+    // código do método...
+  }
+
+Desse modo, o filtro seria aplicado apenas nesse método, mas não nos outros.
+
+Como parâmetro do decorator @UseFilters, você também pode passar uma 
+instância do filtro em vez da própria classe, e ficaria assim:
+
+  @Post()
+  @UseFilters(new FiltroDeExcecao())
+  async criaPedido(/* parâmetros... */) {
+    // código do método...
+  }
+
+Contudo, o próprio Nest afirma que isso pode aumentar o uso de memória da 
+aplicação, então é mais recomendado passar a classe diretamente quando possível, 
+já que o Nest consegue reutilizar sempre a mesma instância da classe através 
+da aplicação.
+
+A outra forma de utilizar o filtro é diretamente em um controlador. 
+Utilizando em PedidoController, por exemplo, teríamos o código abaixo:
+
+@Controller('pedidos')
+@UseFilters(FiltroDeExcecao)
+export class PedidoController {
+  // código do controlador...
+}
+
+Desse modo, o filtro de exceções será aplicado em todas as rotas do controlador,
+mas não para as rotas de outros controladores.
+
+---------------------------------------------------------------------------------
+
+Considere que você tem uma aplicação que ainda não possui nenhum filtro e 
+o time está pedindo para você criar um que capture todos as exceções não 
+tratadas. Além disso, quando a exceção não for do tipo HttpException, o 
+retorno da API deve trazer informações adicionais, como o caminho e o horário 
+em que o erro ocorreu.
+
+Marque as alternativas corretas a respeito do filtro que deve ser criado:
+
+O filtro pode utilizar diretamente o objeto de resposta do Express para criar 
+o retorno da API.
+
+Com o contexto da aplicação, podemos utilizar o método getResponse<Response>() 
+para obter o objeto de resposta do Express. Importamos a interface Response do 
+Express e utilizamos como generics para especificar melhor o tipo do retorno.
+
+O filtro pode sobrescrever o tratamento de erros padrão do Nest.
+
+Assim, será possível incluir informações adicionais no filtro.
+
+---------------------------------------------------------------------------------
+
+    Tratar recursos não encontrados:
+        Conferimos alguns casos onde os métodos do TypeORM podem retornar null 
+        para um registro não encontrado no BD. Para esse casos, lançamos um 
+        erro com a classe NotFoundException.
+
+    Tratar mais requisições incorretas:
+        Tratamos os casos onde a pessoa tentava solicitar uma quantidade de um 
+        produto maior que a cadastrada. Nesse caso, lançamos um erro com a 
+        classe BadRequestException.
+
+    Criar um filtro de exceções:
+        Um filtro de exceções é uma classe que implementa a interface 
+        ExceptionFilter e aplica o decorator @Catch(). Com um filtro, 
+        podemos sobrescrever o tratamento de erros padrão do Nest.
+
+    Capturar todos os erros da aplicação:
+        Para capturar todos os erros não tratados, removemos o HttpException 
+        do @Catch(). Assim, conseguimos obter também os erros de BD, por 
+        exemplo, e incluir informações adicionais no objeto de erro retornado 
+        pela API.
+
+---------------------------------------------------------------------------------
+
+No vídeo anterior, você conheceu o Mapped Type (Tipo Mapeado) PartialType(), 
+que significa “Tipo Parcial”. Com os tipos mapeados, é possível reduzir 
+bastante o código de uma classe e evitar repetições, principalmente ao 
+trabalhar com DTOs.
+
+O PartialType(), em específico, recebe uma classe como parâmetro e aplica em 
+todas as suas propriedades o decorator @IsOptional() do class-validator. 
+O código que usamos no AtualizaUsuarioDTO, por exemplo, ficou assim:
+
+export class AtualizaUsuarioDTO extends PartialType(CriaUsuarioDTO) {}
+
+Além desse tipo mapeado, existem mais três que são fornecidos pelo Nest: 
+PickType(), OmitType() e IntersectionType(). Você pode entender mais 
+sobre eles na seção Mapped types da documentação do Nest.
+
+Mapped types: https://docs.nestjs.com/techniques/validation#mapped-types
+
+---------------------------------------------------------------------------------
+
+Antes de partirmos para o último vídeo, vamos tratar mais alguns recursos 
+na aplicação para deixá-la mais refinada, caso você ainda não tenha feito! 
+Nos casos abaixo, ainda não temos mensagens de erro apropriadas para quando 
+o recurso não é encontrado:
+
+    No arquivo usuario.service.ts, nos métodos buscaPorEmail, 
+    atualizaUsuario e deletaUsuario.
+    No arquivo produto.service.ts, método deletaProduto.
+    No arquivo pedido.service.ts, método obtemPedidosDeUsuario 
+    (quando o id do usuário não é encontrado).
+
+---------------------------------------------------------------------------------
+
+Segue o código final de cada método:
+Arquivo usuario.service.ts
+
+    Método buscaPorEmail:
+
+  async buscaPorEmail(email: string) {
+    const checkEmail = await this.usuarioRepository.findOne({
+      where: { email },
+    });
+
+    if (checkEmail === null)
+      throw new NotFoundException('O email não foi encontrado.');
+
+    return checkEmail;
+  }
+
+Atenção: com o lançamento dessa exceção onde o email não é encontrado, 
+existe outro arquivo da aplicação que devemos mudar. Se trata do 
+src/usuario/validacao/email-eh-unico.validator.ts, que utiliza o 
+método buscaPorEmail. Nesse arquivo, temos um validador que é utilizado 
+na criação de um novo usuário, e ele verifica se o email do usuário 
+já existe.
+
+No entanto, como o método buscaPorEmail do serviço de usuário agora 
+lança uma exceção caso o email não exista, precisamos tratar essa 
+exceção no validador. Isso porque quando o email não existe, na verdade 
+queremos que o validador permita a criação do usuário, então devemos 
+retornar true no método validate. Se, por acaso, o erro lançado não for 
+do tipo NotFoundException, então relançamos o erro para que ele seja 
+tratado pelo filtro de exceções global. O código do método ficará assim:
+
+// email-eh-unico.validator.ts
+
+  async validate(value: any): Promise<boolean> {
+    try {
+      const usuarioComEmailExiste = await this.usuarioService.buscaPorEmail(
+        value,
+      );
+
+      return !usuarioComEmailExiste;
+    } catch (erro) {
+      if (erro instanceof NotFoundException) {
+        return true;
+      }
+
+      throw erro;
+    }
+  }
+
+    Método atualizaUsuario:
+
+Neste método, está sendo utilizado o update() do TypeORM, que atualiza 
+o registro do BD. Contudo, esse método não retorna o usuário em si.
+
+Para que a API retorne o usuário atualizado na resposta, você deve 
+substituir o update() pelo método findOneBy() em conjunto com o 
+save(), pois o save() retorna o usuário do BD:
+
+  async atualizaUsuario(id: string, novosDados: AtualizaUsuarioDTO) {
+   const usuario = await this.usuarioRepository.findOneBy({ id });
+
+    Object.assign(usuario, novosDados);
+
+    return this.usuarioRepository.save(usuario);
+  }
+
+    Método deletaUsuario:
+
+  async deletaUsuario(id: string) {
+    const resultado = await this.usuarioRepository.delete(id);
+
+    if (!resultado.affected)
+      throw new NotFoundException('O usuário não foi encontrado.');
+  }
+
+Nesse código, a propriedade resultado.affected diz quantos registros 
+foram deletados do BD. Se o número deletado for 0, o código dentro 
+do if será executado e o erro será lançado.
+Arquivo produto.service.ts
+
+    Método deletaProduto:
+
+  async deletaProduto(id: string) {
+    const resultado = await this.produtoRepository.delete(id);
+
+    if (!resultado.affected) {
+      throw new NotFoundException('O produto não foi encontrado');
+    }
+  }
+
+Arquivo pedido.service.ts
+
+    Método obtemPedidosDeUsuario:
+
+Nesse método, podemos apenas chamar a função buscaUsuario que já está 
+criada nesse arquivo e que também já está tratando o caso de usuário 
+não encontrado. Portanto, o código ficará assim:
+
+  async obtemPedidosDeUsuario(usuarioId: string) {
+    const usuario = await this.buscaUsuario(usuarioId);
+
+    return this.pedidoRepository.find({
+      where: {
+        usuario: { id: usuarioId },
+      },
+      relations: {
+        usuario: true,
+      },
+    });
+  }
+
+Note que, além da busca que já estava sendo realizada com 
+pedidoRepository.find(), adicionamos mais uma busca ao BD com o 
+método buscaUsuario(). Assim, quando for passado um ID de usuário 
+válido, serão realizadas duas buscas ao BD em vez de apenas uma.
+
+Ou seja, teremos mais um custo de operação nesse caso, mas, em troca, 
+conseguimos refinar o retorno da API, que agora consegue informar 
+corretamente quando for passado um ID de usuário inválido.
+
+Sem essa verificação, a API retornaria uma lista vazia sempre que 
+fosse passado um ID inválido de usuário. Isso seria uma informação 
+incorreta, pois daria entender que o usuário existe e que ele não 
+possui pedidos. Ao invés disso, o melhor a ser feito é dizer que o 
+usuário não foi encontrado, como no código acima.
+
+Com isso, finalizamos o tratamento de mais alguns recursos da API!
+
+---------------------------------------------------------------------------------
+
+Você aprendeu como utilizar os Tipos Mapeados do Nest e como eles podem ajudar 
+a evitar repetição de código ao trabalhar com classes, principalmente em DTOs.
+
+Nesse contexto, considere o seguinte exemplo:
+
+import { IsNotEmpty, Length } from 'class-validator';
+
+export class CriaLivroDTO {
+  @IsNotEmpty()
+  nome: string;
+
+  @Length(10, 5000)
+  numeroPaginas: number;
+}
+
+Agora é necessário criar um DTO de atualização do livro, que permita atualizar 
+qualquer uma de suas propriedades, opcionalmente. Além disso, devemos aplicar 
+a mesma validação de dados que acontece no DTO de criação.
+
+Quais das alternativas abaixo alcança esse objetivo de forma escalável?
+Selecione 2 alternativas 
+
+export class AtualizaLivroDTO extends PartialType(CriaLivroDTO) {}
+
+No nosso caso, onde queremos manter todas as propriedades e validações de 
+CriaLivroDTO e apenas tornar as propriedades opcionais, podemos usar o PartialType 
+do Nest. Se um dia for necessário alterar a lógica de validação de uma 
+propriedade, somente um dos arquivos precisa ser alterado.
+
+export class AtualizaLivroDTO extends CriaLivroDTO {
+  @IsOptional()
+  nome: string;
+
+  @IsOptional()
+  numeroPaginas: number;
+}
+
+A classe está herdando de CriaLivroDTO e apenas adiciona o decorator 
+@IsOptional() nas propriedades. Se um dia for necessário alterar a lógica 
+de validação de uma propriedade, somente um dos arquivos precisa ser alterado.
+
+---------------------------------------------------------------------------------
+
+    Flexibilizar o filtro de exceções:
+        Modificamos o seu código para não ficar totalmente atrelado ao Express. 
+        Agora, caso o time queira alternar entre Express e Fastify, o filtro 
+        já está preparado para essa mudança.
+
+    Aplicar os Mapped Types do Nest:
+        Utilizamos o PartialType para evitar repetição de código nos DTOs.
+
+    Refatorar o código com Object.assign():
+        Deixamos o código dos serviços mais limpo ao atribuir as propriedades 
+        de um DTO a uma entidade. Além disso, para manter a atribuições seguras, 
+        utilizamos o recurso de type assertion (asserção de tipo) do TypeScript.
+
+---------------------------------------------------------------------------------
